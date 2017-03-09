@@ -28,7 +28,7 @@ app.use(session({
     resave: true,
     saveUninitialized: false,
     store: new MongooseStore({
-        ttl: 60000
+        ttl: 600000
     })
 }));
 
@@ -86,7 +86,7 @@ app.get('/auth/google/callback',
                 res.redirect("/login");
             }
             if (result.length === 1) {
-				res.redirect('/users');
+                res.redirect('/users');
             } else if (result.length === 0) {
                 var newUser = new User({
                     id: req.user.id,
@@ -95,7 +95,7 @@ app.get('/auth/google/callback',
                     photoURL: req.user.photos ? req.user.photos[0].value : "http://placehold.it/200x200",
                     admin: false
                 });
-				
+
                 newUser.save(function (err) {
                     if (err) {
                         console.log("Error in inserting user data. " + err);

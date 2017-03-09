@@ -1,3 +1,63 @@
 <% include ../partials/header.ejs %>
+    <script>
+        var nextMatch = {
+            home: {
+                name: 'Kings XI Punjab',
+                logo: 'images/hardik.jpg',
+                captain: 'Hardik Agrawal',
+                position: 1,
+                played: 3,
+                won: 1,
+                lost: 2,
+                tienr: 0
+            },
+            away: {
+                name: 'Chennai Super Kings',
+                logo: 'images/neel.jpg',
+                captain: 'Neel Priyadarshi',
+                position: 4,
+                played: 3,
+                won: 2,
+                lost: 1,
+                tienr: 0
+            }
+        }
+    </script>
+    <div class="uk-card uk-card-default" style="width:320px; margin:10px;">
+        <div class="uk-card-media-top">
+            <img src="images/hardik.jpg" alt="" style="width:320px">
+        </div>
+        <div class="uk-card-body">
+            <h3 class="uk-card-title">Kings XI Punjab</h3>
+            <p><strong>Captain:</strong> Hardik Agrawal</p>
+        </div>
+    </div>
 
-    <% include ../patials/footer.ejs %>
+    <div class="uk-card uk-card-default" style="width:320px; margin:10px;">
+        <div class="uk-card-media-top">
+            <img src="images/vs.png" alt="" style="width:190px;margin-left:20%">
+        </div>
+        <div class="uk-card-body">
+            <h3 class="uk-card-title" style="text-align:center">head to head</h3>
+            <p style="text-align:center">3<strong> played </strong>3</p>
+            <p style="text-align:center">1<strong> won </strong>2</p>
+            <p style="text-align:center">2<strong> lost </strong>1</p>
+            <p style="text-align:center">0<strong> tied/nr </strong>0</p>
+        </div>
+    </div>
+    <div class="uk-card uk-card-default" style="width:320px; margin:10px;">
+        <div class="uk-card-media-top">
+            <img src="images/neel.jpg" alt="" style="width:320px">
+        </div>
+        <div class="uk-card-body">
+            <h3 class="uk-card-title">Chennai Super Kings</h3>
+            <p><strong>Captain:</strong> Neel Priyadarshi</p>
+        </div>
+    </div>
+    <script>
+        var parent = document.querySelector('.uk-flex.uk-flex-center');
+        var card = document.createElement('div');
+        card.setAttribute('class', 'uk-card uk-card-default');
+        card.setAttribute('class', 'width:320px; margin:10px');
+    </script>
+    <% include ../partials/footer.ejs %>

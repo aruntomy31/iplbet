@@ -6,14 +6,16 @@ var User = require('../db/User');
 
 function ensureAuthenticated(req, res, next) {
     if (req.session.passport.user.id) {
-		req.user = req.session.passport.user;
+        req.user = req.session.passport.user;
         return next();
     }
     res.redirect('/login');
 }
 
 router.get('/', function (request, response) {
-    response.render('pages/index');
+    response.render('pages/index', {
+        title: 'Hello World'
+    });
 });
 
 router.get('/users', ensureAuthenticated, function (req, res, next) {
