@@ -9,8 +9,10 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var passport = require('passport');
 var mongoose = require('mongoose');
+var MongooseStore = require('mongoose-store')(session);
 var app = express();
 var authConfig = require('./config/auth.json');
+var connectionString = process.env.MONGODB_URI;
 
 //Middlewares
 app.use(logger("dev"));
@@ -22,11 +24,13 @@ app.use(cookieParser());
 app.use(session({
     secret: 'keyboard cat',
     resave: true,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: new MongooseStore({
+        url: connectionString
+    })
 }));
 
 //Schemas
-var connectionString = process.env.MONGODB_URI;
 mongoose.connect(connectionString);
 mongoose.Promise = global.Promise;
 var User = require('./db/User');
@@ -83,11 +87,7 @@ app.get('/auth/google/callback',
                 res.redirect("/login");
             }
             if (result.length === 1) {
-                req.login(req.user, function (error) {
-                    if (!error) {
-                        res.redirect('/users');
-                    }
-                });
+                res.redirect('/users');
             } else if (result.length === 0) {
                 var newUser = new User({
                     id: req.user.id,
@@ -101,11 +101,7 @@ app.get('/auth/google/callback',
                         console.log("Error in inserting user data. " + err);
                         res.redirect("/login");
                     }
-                    req.login(req.user, function (error) {
-                        if (!error) {
-                            res.redirect('/users');
-                        }
-                    });
+                    res.redirect('/users');
                 });
             } else {
                 res.redirect("/login");
