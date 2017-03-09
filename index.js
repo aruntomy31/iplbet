@@ -18,8 +18,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
-app.use(cookieParser());
-app.use(session({
+app.use(express.cookieParser());
+app.use(express.session({
     secret: 'keyboard cat',
     resave: true,
     saveUninitialized: false
