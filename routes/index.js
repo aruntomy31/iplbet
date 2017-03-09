@@ -8,7 +8,7 @@ router.get('/', function (request, response) {
 });
 
 router.get('/users', function (req, res, next) {
-    res.send(req);
+    res.send(req.body);
 });
 
 router.get('/login', function (req, res, next) {
