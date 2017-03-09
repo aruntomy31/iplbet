@@ -15,6 +15,7 @@ var authConfig = require('./config/auth.json');
 //Schemas
 var connectionString = process.env.MONGODB_URI;
 mongoose.connect(connectionString);
+mongoose.Promise = global.Promise;
 var User = require('./db/User');
 
 //Route Definitions
