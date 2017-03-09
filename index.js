@@ -12,6 +12,19 @@ var mongoose = require('mongoose');
 var app = express();
 var authConfig = require('./config/auth.json');
 
+//Middlewares
+app.use(logger("dev"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+app.use(cookieParser());
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
+}));
+
 //Schemas
 var connectionString = process.env.MONGODB_URI;
 mongoose.connect(connectionString);
@@ -25,8 +38,6 @@ var index = require('./routes/index');
 app.use('/', index);
 
 //Auth
-
-
 var GOOGLE_CLIENT_ID = authConfig.google.clientid;
 var GOOGLE_CLIENT_SECRET = authConfig.google.clientsecret;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
