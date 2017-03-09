@@ -98,6 +98,9 @@ app.set('view engine', 'ejs');
 
 app.use(mongooseMiddleware(connectionString));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.listen(app.get('port'), function () {
     console.log('Node app is running on port', app.get('port'));
 });
