@@ -11,4 +11,8 @@ router.get('/users', function (req, res, next) {
     res.send(JSON.stringify(req.user));
 });
 
+router.get('/login', function (req, res, next) {
+    res.status(500).send('Failed');
+});
+
 module.exports = router;
