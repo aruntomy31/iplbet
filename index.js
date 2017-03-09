@@ -9,10 +9,12 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var passport = require('passport');
 var mongoose = require('mongoose');
-var MongooseStore = require('mongoose-store')(session);
+var MongooseStore = require('express-mongoose-store')(session, mongoose);
 var app = express();
 var authConfig = require('./config/auth.json');
-var connectionString = process.env.MONGODB_URI;
+var connectionString = 'mongodb://localhost:27017/iplbet'; //process.env.MONGODB_URI;
+mongoose.connect(connectionString);
+mongoose.Promise = global.Promise;
 
 //Middlewares
 app.use(logger("dev"));
@@ -26,13 +28,11 @@ app.use(session({
     resave: true,
     saveUninitialized: false,
     store: new MongooseStore({
-        url: connectionString
+        ttl: 60000
     })
 }));
 
 //Schemas
-mongoose.connect(connectionString);
-mongoose.Promise = global.Promise;
 var User = require('./db/User');
 
 //Route Definitions
@@ -60,7 +60,7 @@ passport.deserializeUser(function (obj, done) {
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://iplbet.herokuapp.com/auth/google/callback"
+    callbackURL: "http://localhost:5000/auth/google/callback" // "http://iplbet.herokuapp.com/auth/google/callback"
 }, function (accessToken, refreshToken, profile, done) {
     return done(null, profile);
 }));
@@ -74,7 +74,6 @@ app.get('/auth/google/callback',
         failureRedirect: '/login'
     }),
     function (req, res) {
-        console.log('Authenticated.');
         User.find({
             $or: [{
                 id: req.user.id
@@ -87,7 +86,7 @@ app.get('/auth/google/callback',
                 res.redirect("/login");
             }
             if (result.length === 1) {
-                res.redirect('/users');
+				res.redirect('/users');
             } else if (result.length === 0) {
                 var newUser = new User({
                     id: req.user.id,
@@ -96,6 +95,7 @@ app.get('/auth/google/callback',
                     photoURL: req.user.photos ? req.user.photos[0].value : "http://placehold.it/200x200",
                     admin: false
                 });
+				
                 newUser.save(function (err) {
                     if (err) {
                         console.log("Error in inserting user data. " + err);

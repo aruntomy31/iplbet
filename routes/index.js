@@ -5,7 +5,8 @@ var router = express.Router();
 var User = require('../db/User');
 
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.session.passport.user.id) {
+		req.user = req.session.passport.user;
         return next();
     }
     res.redirect('/login');
