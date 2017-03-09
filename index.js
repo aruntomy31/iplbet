@@ -23,6 +23,9 @@ var index = require('./routes/index');
 app.use('/', index);
 
 //Auth
+app.use(passport.initialize());
+app.use(passport.session());
+
 var GOOGLE_CLIENT_ID = authConfig.google.clientid;
 var GOOGLE_CLIENT_SECRET = authConfig.google.clientsecret;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -97,9 +100,6 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.use(mongooseMiddleware(connectionString));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.listen(app.get('port'), function () {
     console.log('Node app is running on port', app.get('port'));
