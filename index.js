@@ -9,7 +9,7 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var passport = require('passport');
 var app = express();
-var authConfig = require('config/auth.json');
+var authConfig = require('./config/auth.json');
 
 //Schemas
 var connectionString = process.env.MONGODB_URI;
