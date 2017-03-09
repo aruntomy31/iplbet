@@ -13,7 +13,7 @@ var authConfig = require('./config/auth.json');
 
 //Schemas
 var connectionString = process.env.MONGODB_URI;
-var mongooseMiddleware = require('./db/mongooseMiddleware');
+mongoose.connect(connectionString);
 var User = require('./db/User');
 
 //Route Definitions
@@ -99,8 +99,6 @@ app.use(express.static(__dirname + '/public'));
 // views is directory for all template files
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-
-app.use(mongooseMiddleware(connectionString));
 
 app.listen(app.get('port'), function () {
     console.log('Node app is running on port', app.get('port'));
