@@ -8,6 +8,7 @@ var logger = require("morgan");
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var passport = require('passport');
+var mongoose = require('mongoose');
 var app = express();
 var authConfig = require('./config/auth.json');
 
