@@ -55,6 +55,7 @@ app.get('/auth/google/callback',
         failureRedirect: '/login'
     }),
     function (req, res) {
+        console.log('Authenticated.');
         User.find({
             $or: [{
                 id: req.user.id
