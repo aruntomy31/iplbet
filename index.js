@@ -83,7 +83,9 @@ app.get('/auth/google/callback',
                 res.redirect("/login");
             }
             if (result.length === 1) {
-                res.redirect("/users");
+                req.session.save(() => function () {
+                    res.redirect("/users");
+                });
             } else if (result.length === 0) {
                 var newUser = new User({
                     id: req.user.id,
@@ -97,7 +99,9 @@ app.get('/auth/google/callback',
                         console.log("Error in inserting user data. " + err);
                         res.redirect("/login");
                     }
-                    res.redirect("/users");
+                    req.session.save(() => function () {
+                        res.redirect("/users");
+                    });
                 });
             } else {
                 res.redirect("/login");
