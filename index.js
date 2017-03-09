@@ -38,6 +38,9 @@ var index = require('./routes/index');
 app.use('/', index);
 
 //Auth
+app.use(passport.initialize());
+app.use(passport.session());
+
 var GOOGLE_CLIENT_ID = authConfig.google.clientid;
 var GOOGLE_CLIENT_SECRET = authConfig.google.clientsecret;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -57,9 +60,6 @@ passport.use(new GoogleStrategy({
 }, function (accessToken, refreshToken, profile, done) {
     return done(null, profile);
 }));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.get('/auth/google', passport.authenticate('google', {
     scope: ['email profile']
