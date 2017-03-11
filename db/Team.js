@@ -13,7 +13,7 @@ var team = new mongoose.Schema({
     positionLastYear: Number,
     titles: Number,
     players: [{
-        type : mongoose.Schema.Type.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref  : 'Player'
     }]
 });

@@ -9,16 +9,16 @@ var player = new mongoose.Schema({
         unique: true
     },
     team: {
-        type : mongoose.Schema.Type.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref  : 'Team'
     },
     matches : Number,
     battingStats: {
-        type : mongoose.Schema.Type.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref  : 'BattingStatistics'
     },
     bowlingStats: {
-        type : mongoose.Schema.Type.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref  : 'BowlingStatistics'
     }
 });
