@@ -11,28 +11,26 @@ var favicon = require("serve-favicon");
 var bodyParser = require("body-parser");
 var session = require("express-session");
 var cookieParser = require("cookie-parser");
-var MongooseStore = require('express-mongoose-store')(session, mongoose);
+var MongooseStore = require('connect-mongo')(session);
 
 // Connect to MongoDB
 mongoose.connect(require('./config/mongo').uri);
-mongoose.Promise = global.Promise;
 
 // Express Server
 var app = express();
 
 // Middlewares
+app.use(express.static(__dirname + '/public'));
 app.use(logger("dev"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(session({
     secret: 'keyboard cat',
     resave: true,
     saveUninitialized: false,
     store: new MongooseStore({
-        ttl: 60000
+        mongooseConnection: mongoose.connection
     })
 }));
 
@@ -44,7 +42,6 @@ var router = require('./routes/router');
 
 // Route Inclusions
 app.use('/', router);
-app.use(express.static(__dirname + '/public'));
 
 // 'views' is directory for all template files
 app.set('views', __dirname + '/views');

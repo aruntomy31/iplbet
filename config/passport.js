@@ -22,19 +22,18 @@ function _createUserObject(id, name, email, image) {
 }
 
 function checkUserExistOrAdd(user, done) {
-    User.find({ $or : [
+    User.findOne({ $or : [
         { id: user.id },
         { email: user.email }
-    ] }, function(error, users) {
-        if(error) done(error, null);
-        else {
-            if(users.length === 0) {
-                user.save(function(error, user) {
-                    if(error) done(error, null);
-                    else done(null, user);
-                });
-            } else done(null, users[0]);
+    ] }, function(error, userFound) {
+        if(error) return done(error, null);
+        if(!userFound) {
+            user.save(function(error, userCreated) {
+                if(error) return done(error, null);
+                return done(null, userCreated);
+            });
         }
+        return done(null, userFound);
     });
 }
 
@@ -49,7 +48,9 @@ module.exports = function(app, passport) {
     });
     
     passport.deserializeUser(function(user, done) {
-        done(null, user);
+        User.findById(user, function(error, userFound) {
+            done(error, userFound);
+        });
     });
     
     passport.use(new Strategy.Google({
@@ -78,41 +79,37 @@ module.exports = function(app, passport) {
         checkUserExistOrAdd(_createUserObject(user.id, user.displayName, user.emails[0].value, user.photos[0].value), done);
     }));
     
-    var failRedirect = { failureRedirect: '/login' };
-    
-    var redirectIfAuthenticated = function(request, response, next) {
-        if(request.isAuthenticated()) authCallback(request, response);
-        else return next();
+    var redirect = {
+        successRedirect: '/users',
+        failureRedirect: '/login'
     };
     
-    var authCallback = function(request, response) {
-        if(request.user) {
-            if(request.user.admin === true) response.redirect("/admin");
-            else response.redirect("/users");
-        } else response.redirect("/login");
+    var redirectIfAuthenticated = function(request, response, next) {
+        if(request.isAuthenticated()) response.redirect(redirect.successRedirect);
+        else return next();
     };
     
     // Google Authentication Route & Callback
     
-    app.get('/auth/google', redirectIfAuthenticated, passport.authenticate('google', { scope: ['email profile'] }));
+    app.get('/auth/google', redirectIfAuthenticated, passport.authenticate('google', { scope: ['profile', 'email'] }));
     
-    app.get('/auth/google/callback', passport.authenticate('google', failRedirect), authCallback);
+    app.get('/auth/google/callback', passport.authenticate('google', redirect));
     
     // Facebook Authentication Route & Callback
     
     app.get('/auth/facebook', redirectIfAuthenticated, passport.authenticate('facebook', { scope: ['email', 'public_profile'] }));
     
-    app.get('/auth/facebook/callback', passport.authenticate('facebook', failRedirect), authCallback);
+    app.get('/auth/facebook/callback', passport.authenticate('facebook', redirect));
     
     // Twitter Authentication Route & Callback
     
     app.get('/auth/twitter', redirectIfAuthenticated, passport.authenticate('twitter'));
     
-    app.get('/auth/twitter/callback', passport.authenticate('twitter', failRedirect), authCallback);
+    app.get('/auth/twitter/callback', passport.authenticate('twitter', redirect));
     
     app.get('/logout', function(request, response) {
         request.logout();
-        response.redirect('/');
+        response.status(200).send("Logged Out. <br><a href='/auth/google'>Login with Google</a>");
     });
     
 };

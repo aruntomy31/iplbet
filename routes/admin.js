@@ -32,6 +32,49 @@ router.get('/backup', function(request, response) {
 
 router.get('/initialize', function(request, response) {
     
+    var teams = require('../config/team');
+    for(var shortName in teams) {
+        var team = new Team({
+            id: shortName,
+            name: teams[shortName].name,
+            logo: teams[shortName].logo,
+            positionLastYear: teams[shortName].positionLastYear,
+            titles: teams[shortName].titles
+        });
+        
+        team.save(function(error, team) {
+            if(error) {
+                console.log("Unable to save team [" + shortName + "]");
+                response.redirect('/admin');
+                return;
+            }
+            for(var playerName of teams[shortName].players) {
+                var player = new Player({
+                    name: playerName,
+                    team: team._id,
+                    matches: 0
+                });
+                
+                player.save(function(error, player) {
+                    if(error) {
+                        console.log("Unable to save player [" + playerName + "] of team [" + shortName + "]");
+                        response.redirect('/admin');
+                        return;
+                    }
+                    
+                    team.players.push(player._id);
+                    team.save(function(error, team) {
+                        if(error) {
+                            console.log("Unable to add player [" + playerName + "] to team [" + shortName + "]");
+                            response.redirect('/admin');
+                            return;
+                        }
+                    });
+                });
+            }
+        });
+    }
+    
 });
 
 module.exports = router;
