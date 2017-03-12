@@ -14,7 +14,36 @@ function ensureAuthenticated(req, res, next) {
 
 router.get('/', function (request, response) {
     response.render('pages/index', {
-        title: 'Hello World'
+        title: 'BettingBad : Home',
+        active: 'home'
+    });
+});
+
+router.get('/rules', function (request, response) {
+    response.render('pages/rules', {
+        title: 'BettingBad : Rules',
+        active: 'rules'
+    });
+});
+
+router.get('/fixtures', function (request, response) {
+    response.render('pages/fixtures', {
+        title: 'BettingBad : Fixtures',
+        active: 'fixtures'
+    });
+});
+
+router.get('/prizes', function (request, response) {
+    response.render('pages/prizes', {
+        title: 'BettingBad : Prizes',
+        active: 'prizes'
+    });
+});
+
+router.get('/stats', function (request, response) {
+    response.render('pages/stats', {
+        title: 'BettingBad : Statistics',
+        active: 'stats'
     });
 });
 

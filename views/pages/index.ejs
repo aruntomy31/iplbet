@@ -1,63 +1,127 @@
 <% include ../partials/header.ejs %>
     <script>
-        var nextMatch = {
-            home: {
+        var teams = [
+            {
                 name: 'Kings XI Punjab',
-                logo: 'images/hardik.jpg',
-                captain: 'Hardik Agrawal',
-                position: 1,
-                played: 3,
-                won: 1,
-                lost: 2,
-                tienr: 0
+                shortName: 'KXIP',
+                captain: 'Murali Vijay',
+                positionLastYear: 1,
+                titles: 3
             },
-            away: {
-                name: 'Chennai Super Kings',
-                logo: 'images/neel.jpg',
-                captain: 'Neel Priyadarshi',
-                position: 4,
-                played: 3,
-                won: 2,
-                lost: 1,
-                tienr: 0
+            {
+                name: 'Gujarat Lions',
+                shortName: 'GL',
+                captain: 'Suresh Raina',
+                positionLastYear: 3,
+                titles: 2
+            },
+            {
+                name: 'Mumbai Indians',
+                shortName: 'MI',
+                captain: 'Rohit Sharma',
+                positionLastYear: 2,
+                titles: 2
+            },
+            {
+                name: 'Royal Challengers Bangalore',
+                shortName: 'RCB',
+                captain: 'Virat Kohli',
+                positionLastYear: 4,
+                titles: 2
+            },
+            {
+                name: 'Kolkata Knight Riders',
+                shortName: 'KKR',
+                captain: 'Gautham Gambhir',
+                positionLastYear: 1,
+                titles: 3
+            },
+            {
+                name: 'Sun Risers Hyderabad',
+                shortName: 'SRH',
+                captain: 'David Warner',
+                positionLastYear: 3,
+                titles: 2
+            },
+            {
+                name: 'Rising Pune Supergiants',
+                shortName: 'RPS',
+                captain: 'Mahendra Singh Dhoni',
+                positionLastYear: 2,
+                titles: 2
+            },
+            {
+                name: 'Delhi Daredevils',
+                shortName: 'DD',
+                captain: 'Zaheer Khan',
+                positionLastYear: 4,
+                titles: 2
             }
+        ];
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
         }
+        teams = shuffle(teams);
     </script>
-    <div class="uk-card uk-card-default" style="width:320px; margin:10px;">
-        <div class="uk-card-media-top">
-            <img src="images/hardik.jpg" alt="" style="width:320px">
-        </div>
-        <div class="uk-card-body">
-            <h3 class="uk-card-title">Kings XI Punjab</h3>
-            <p><strong>Captain:</strong> Hardik Agrawal</p>
-        </div>
-    </div>
 
-    <div class="uk-card uk-card-default" style="width:320px; margin:10px;">
-        <div class="uk-card-media-top">
-            <img src="images/vs.png" alt="" style="width:190px;margin-left:20%">
-        </div>
-        <div class="uk-card-body">
-            <h3 class="uk-card-title" style="text-align:center">head to head</h3>
-            <p style="text-align:center">3<strong> played </strong>3</p>
-            <p style="text-align:center">1<strong> won </strong>2</p>
-            <p style="text-align:center">2<strong> lost </strong>1</p>
-            <p style="text-align:center">0<strong> tied/nr </strong>0</p>
-        </div>
-    </div>
-    <div class="uk-card uk-card-default" style="width:320px; margin:10px;">
-        <div class="uk-card-media-top">
-            <img src="images/neel.jpg" alt="" style="width:320px">
-        </div>
-        <div class="uk-card-body">
-            <h3 class="uk-card-title">Chennai Super Kings</h3>
-            <p><strong>Captain:</strong> Neel Priyadarshi</p>
-        </div>
+    <div class="ui link cards segment">
     </div>
     <script>
-        var parent = document.querySelector('.uk-flex.uk-flex-center');
-        var card = document.createElement('div');
-        card.setAttribute('class', 'uk-card uk-card-default');
-        card.setAttribute('class', 'width:320px; margin:10px');
+        var parent = document.querySelector('.ui.link.cards');
+        teams.forEach(function (team) {
+            var card = document.createElement('div');
+            card.setAttribute('class', 'card');
+
+            var imagediv = document.createElement('div');
+            imagediv.setAttribute('class', 'image');
+            var image = document.createElement('img');
+            image.setAttribute('src', 'images/' + team.shortName.toLowerCase() + '.png');
+            imagediv.appendChild(image);
+
+            var contentdiv = document.createElement('div');
+            contentdiv.setAttribute('class', 'content');
+            var headerdiv = document.createElement('div');
+            headerdiv.setAttribute('class', 'header');
+            headerdiv.textContent = team.name;
+            var metadiv = document.createElement('div');
+            metadiv.setAttribute('class', 'meta');
+            metadiv.textContent = team.shortName;
+            var descriptiondiv = document.createElement('div');
+            descriptiondiv.setAttribute('class', 'description');
+            descriptiondiv.innerHTML = '<strong>Captain:</strong> ' + team.captain;
+            contentdiv.appendChild(headerdiv);
+            contentdiv.appendChild(metadiv);
+            contentdiv.appendChild(descriptiondiv);
+
+            var extradiv = document.createElement('div');
+            extradiv.setAttribute('class', 'extra content');
+            var rightspan = document.createElement('span');
+            rightspan.setAttribute('class', 'right floated');
+            rightspan.textContent = '#' + team.positionLastYear + ' in 2016';
+            var leftspan = document.createElement('span');
+            var icon = document.createElement('i');
+            icon.setAttribute('class', 'trophy icon');
+            leftspan.appendChild(icon);
+            leftspan.appendChild(document.createTextNode(team.titles + ' titles'));
+            extradiv.appendChild(rightspan);
+            extradiv.appendChild(leftspan);
+
+            card.appendChild(imagediv);
+            card.appendChild(contentdiv);
+            card.appendChild(extradiv);
+
+            parent.appendChild(card);
+        });
     </script>
     <% include ../partials/footer.ejs %>
