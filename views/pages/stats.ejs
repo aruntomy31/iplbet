@@ -29,6 +29,86 @@
                 fair: 30
             }
         ];
+        var oranges = [
+            {
+                name: 'David Warner',
+                team: 'Sun Risers Hyderabad',
+                matches: 4,
+                runs: 294,
+                strikeRate: 200.32,
+                six: 13,
+                four: 15,
+                photo: 'images/srh.png'
+            },
+            {
+                name: 'Glen Maxwell',
+                team: 'Kings XI Punjab',
+                matches: 4,
+                runs: 224,
+                strikeRate: 160.32,
+                six: 10,
+                four: 10,
+                photo: 'images/kxip.png'
+            },
+            {
+                name: 'Chris Gayle',
+                team: 'Royal Challengers Bangalore',
+                matches: 4,
+                runs: 201,
+                strikeRate: 230.32,
+                six: 19,
+                four: 5,
+                photo: 'images/rcb.png'
+            },
+            {
+                name: 'Virat Kohli',
+                team: 'Royal Challengers Bangalore',
+                matches: 4,
+                runs: 194,
+                strikeRate: 200.32,
+                six: 8,
+                four: 8,
+                photo: 'images/rcb.png'
+            }            
+        ];
+        var purples = [
+            {
+                name: 'Sunil Narine',
+                team: 'Kolkata Knight Riders',
+                matches: 4,
+                wickets: 12,
+                econ: 5.98,
+                best: '4/12',
+                photo: 'images/kkr.png'
+            },
+            {
+                name: 'Ravichandran Ashwin',
+                team: 'Delhi Daredevils',
+                matches: 4,
+                wickets: 11,
+                econ: 6.43,
+                best: '4/21',
+                photo: 'images/dd.png'
+            },
+            {
+                name: 'Ravindra Jadeja',
+                team: 'Kings XI Punjab',
+                matches: 4,
+                wickets: 10,
+                econ: 8.21,
+                best: '3/33',
+                photo: 'images/kxip.png'
+            },
+            {
+                name: 'Adam Zampa',
+                team: 'Rising Pune Supergiants',
+                matches: 4,
+                wickets: 7,
+                econ: 8.88,
+                best: '2/22',
+                photo: 'images/rps.png'
+            }            
+        ];
     </script>
     <div class="ui top attached tabular link menu" style="width:80%; margin-left: 10%;">
         <div class="active item" id="team">Team Standings</div>
@@ -55,8 +135,39 @@
                 </tbody>
             </table>
         </div>
-        <div id="orange-stat" class="tabelement hidden">tab two</div>
-        <div id="purple-stat" class="tabelement hidden">tab three</div>
+        <div id="orange-stat" class="tabelement hidden">
+            <table class="ui very basic collapsing striped celled table" style="width:90%; margin-left: 5%;">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Player</th>
+                        <th>Matches</th>
+                        <th>Runs</th>
+                        <th>6s</th>
+                        <th>4s</th>
+                        <th>Strike Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div id="purple-stat" class="tabelement hidden">
+            <table class="ui very basic collapsing striped celled table" style="width:90%; margin-left: 5%;">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Player</th>
+                        <th>Matches</th>
+                        <th>Wickets</th>
+                        <th>Economy</th>
+                        <th>Best Figures</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
     <script>
         //TAB SWITCHING LOGIC
@@ -125,6 +236,102 @@
             var td9 = document.createElement('td');
             td9.textContent = team.fair;
             tr.appendChild(td9);
+
+            parent.appendChild(tr);
+        });
+        //ORANGE TAB
+        var parent = document.querySelector('#orange-stat tbody');
+        var i = 1;
+        oranges.forEach(function (orange) {
+            var tr = document.createElement('tr');
+
+            var td1 = document.createElement('td');
+            td1.textContent = i++;
+            tr.appendChild(td1);
+
+            var td2 = document.createElement('td');
+            var h4 = document.createElement('h4');
+            h4.setAttribute('class', 'ui image header');
+            var divContent = document.createElement('div');
+            divContent.setAttribute('class', 'content');
+            divContent.appendChild(document.createTextNode(orange.name));
+            var divSubHeader = document.createElement('div');
+            divSubHeader.setAttribute('class', 'sub header');
+            divSubHeader.textContent = orange.team;
+            divContent.appendChild(divSubHeader);
+            var img = document.createElement('img');
+            img.setAttribute('src', orange.photo);
+            img.setAttribute('class', 'ui mini rounded image');
+            h4.appendChild(img);
+            h4.appendChild(divContent);
+            td2.appendChild(h4);
+            tr.appendChild(td2);
+
+            var td3 = document.createElement('td');
+            td3.textContent = orange.matches;
+            tr.appendChild(td3);
+
+            var td4 = document.createElement('td');
+            td4.textContent = orange.runs;
+            tr.appendChild(td4);
+
+            var td5 = document.createElement('td');
+            td5.textContent = orange.six;
+            tr.appendChild(td5);
+
+            var td6 = document.createElement('td');
+            td6.textContent = orange.four;
+            tr.appendChild(td6);
+
+            var td7 = document.createElement('td');
+            td7.textContent = orange.strikeRate;
+            tr.appendChild(td7);
+
+            parent.appendChild(tr);
+        });
+        //PURPLE TAB
+        var parent = document.querySelector('#purple-stat tbody');
+        var i = 1;
+        purples.forEach(function (purple) {
+            var tr = document.createElement('tr');
+
+            var td1 = document.createElement('td');
+            td1.textContent = i++;
+            tr.appendChild(td1);
+
+            var td2 = document.createElement('td');
+            var h4 = document.createElement('h4');
+            h4.setAttribute('class', 'ui image header');
+            var divContent = document.createElement('div');
+            divContent.setAttribute('class', 'content');
+            divContent.appendChild(document.createTextNode(purple.name));
+            var divSubHeader = document.createElement('div');
+            divSubHeader.setAttribute('class', 'sub header');
+            divSubHeader.textContent = purple.team;
+            divContent.appendChild(divSubHeader);
+            var img = document.createElement('img');
+            img.setAttribute('src', purple.photo);
+            img.setAttribute('class', 'ui mini rounded image');
+            h4.appendChild(img);
+            h4.appendChild(divContent);
+            td2.appendChild(h4);
+            tr.appendChild(td2);
+
+            var td3 = document.createElement('td');
+            td3.textContent = purple.matches;
+            tr.appendChild(td3);
+
+            var td4 = document.createElement('td');
+            td4.textContent = purple.wickets;
+            tr.appendChild(td4);
+
+            var td5 = document.createElement('td');
+            td5.textContent = purple.econ;
+            tr.appendChild(td5);
+
+            var td6 = document.createElement('td');
+            td6.textContent = purple.best;
+            tr.appendChild(td6);
 
             parent.appendChild(tr);
         });

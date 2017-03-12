@@ -54,9 +54,28 @@ router.get('/users', ensureAuthenticated, function (req, res, next) {
         if (err) {
             res.redirect('/login');
         }
-        res.send(item);
+        res.render('pages/users/index', {
+            user: {
+                name: 'Lallu Anthoor'
+            },
+            active: 'home'
+        });
     });
 });
+
+router.get('/userdummy', function(req, res, next){
+    res.render('pages/users/index', {
+        title: 'BettingBad : User Home',
+        user: {
+            name: 'Lallu Anthoor',
+            moneyInHand: 200000,
+            moneyInBet: 100000,
+            moneyWon: 223492,
+            moneyLost: 234234
+        },
+        active: 'home'
+    })
+})
 
 router.get('/login', function (req, res, next) {
     res.status(500).send('Failed');

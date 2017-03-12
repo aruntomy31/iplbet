@@ -1,0 +1,76 @@
+<% include ../../partials/users/header.ejs %>
+    <div class="ui cards segment" style="width:90%; margin-left:5%; margin-top:20px;">
+        <div class="ui centered card">
+            <div class="content">
+                <div class="ui statistic">
+                    <div class="value">₹
+                        <%= user.moneyInHand.toLocaleString('en-IN') %>
+                    </div>
+                    <div class="label">Cash In Hand</div>
+                </div>
+            </div>
+        </div>
+        <div class="ui centered card">
+            <div class="content">
+                <div class="ui statistic">
+                    <div class="value">₹
+                        <%= user.moneyInBet.toLocaleString('en-IN') %>
+                    </div>
+                    <div class="label">Money in Bets</div>
+                </div>
+            </div>
+        </div>
+        <div class="ui centered card">
+            <div class="content">
+                <div class="ui statistic">
+                    <div class="value">₹
+                        <%= user.moneyWon.toLocaleString('en-IN') %>
+                    </div>
+                    <div class="label">Money Won</div>
+                </div>
+            </div>
+        </div>
+        <div class="ui centered card">
+            <div class="content">
+                <div class="ui statistic">
+                    <div class="value">₹
+                        <%= user.moneyLost.toLocaleString('en-IN') %>
+                    </div>
+                    <div class="label">Money Lost</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <canvas id="myChart" style="height:300px !important; margin-top: 20px;"></canvas>
+    <script>
+        var ctx = document.getElementById("myChart");
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['5/4', '6/4', '7/4', '8/4', '9/4', '10/4', '11/4', '12/4', '13/4', '14/4'],
+                datasets: [{
+                    tension: 0.1,
+                    label: 'Cash in Hand',
+                    data: [20000, 50000, 25000, 10000, 27635, 39883, 62352, 78232, 99382, 54678],
+                    backgroundColor: [
+                        'rgba(255, 255, 255, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+    </script>
+    <% include ../../partials/users/footer.ejs %>
