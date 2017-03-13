@@ -75,13 +75,13 @@
         teams = shuffle(teams);
     </script>
 
-    <div class="ui link cards segment">
+    <div class="ui link four cards segment">
     </div>
     <script>
         var parent = document.querySelector('.ui.link.cards');
         teams.forEach(function (team) {
             var card = document.createElement('div');
-            card.setAttribute('class', 'ui centered card');
+            card.setAttribute('class', 'ui centered raised card');
 
             var imagediv = document.createElement('div');
             imagediv.setAttribute('class', 'image');

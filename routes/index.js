@@ -63,7 +63,7 @@ router.get('/users', ensureAuthenticated, function (req, res, next) {
     });
 });
 
-router.get('/userdummy', function(req, res, next){
+router.get('/userdummy', function (req, res, next) {
     res.render('pages/users/index', {
         title: 'BettingBad : User Home',
         user: {
@@ -74,8 +74,22 @@ router.get('/userdummy', function(req, res, next){
             moneyLost: 234234
         },
         active: 'home'
-    })
-})
+    });
+});
+
+router.get('/betdummy', function (req, res, next) {
+    res.render('pages/users/placebet', {
+        title: 'BettingBad : Place Bets',
+        user: {
+            name: 'Lallu Anthoor',
+            moneyInHand: 200000,
+            moneyInBet: 100000,
+            moneyWon: 223492,
+            moneyLost: 234234
+        },
+        active: 'bets'
+    });
+});
 
 router.get('/login', function (req, res, next) {
     res.status(500).send('Failed');

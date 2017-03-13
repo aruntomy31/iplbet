@@ -13,7 +13,7 @@ var MongooseStore = require('express-mongoose-store')(session, mongoose);
 var app = express();
 var authConfig = require('./config/auth.json');
 var connectionString = 'mongodb://localhost:27017/iplbet'; //process.env.MONGODB_URI;
-mongoose.connect(connectionString);
+//mongoose.connect(connectionString);
 mongoose.Promise = global.Promise;
 
 //Middlewares
@@ -26,10 +26,10 @@ app.use(cookieParser());
 app.use(session({
     secret: 'keyboard cat',
     resave: true,
-    saveUninitialized: false,
-    store: new MongooseStore({
-        ttl: 600000
-    })
+    saveUninitialized: false
+//    store: new MongooseStore({
+//        ttl: 600000
+//    })
 }));
 
 //Schemas
