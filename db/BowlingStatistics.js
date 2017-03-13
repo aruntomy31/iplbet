@@ -2,10 +2,14 @@
 
 var mongoose = require('mongoose');
 
-var bowlingStatistics = new mongoose.Schema({
-    balls      : Number,
-    runsGiven  : Number,
-    wickets    : Number
+var Schema = mongoose.Schema;
+
+var bowlingStatistics = Schema({
+    balls          : Number,
+    maidens        : Number,
+    runsConceded   : Number,
+    wickets        : Number,
+    bestFigures    : String
 });
 
 module.exports = mongoose.model('BowlingStatistics', bowlingStatistics);

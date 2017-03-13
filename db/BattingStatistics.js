@@ -2,15 +2,17 @@
 
 var mongoose = require('mongoose');
 
-var battingStatistics = new mongoose.Schema({
+var Schema = mongoose.Schema;
+
+var battingStatistics = new Schema({
     notOuts    : Number,
     runsScored : Number,
     strikeRate : Number,
     highScore  : Number,
     hundreds   : Number,
-    fiftys     : Number,
+    fifties    : Number,
     fours      : Number,
-    sixs       : Number
+    sixes      : Number
 });
 
 module.exports = mongoose.model('BattingStatistics', battingStatistics);

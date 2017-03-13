@@ -2,7 +2,10 @@
 
 var mongoose = require('mongoose');
 
-var team = new mongoose.Schema({
+var Schema = mongoose.Schema;
+var Object = mongoose.Schema.Types.Object;
+
+var team = new Schema({
     id: {
         type: String,
         required: true,
@@ -10,12 +13,17 @@ var team = new mongoose.Schema({
     },
     name: String,
     logo: String,
+    currentPosition: Number,
     positionLastYear: Number,
     titles: Number,
     players: [{
-        type : mongoose.Schema.Types.ObjectId,
+        type : Object,
         ref  : 'Player'
-    }]
+    }],
+    teamStats: {
+        type : Object,
+        ref  : 'TeamStatistics'
+    }
 });
 
 module.exports = mongoose.model('Team', team);

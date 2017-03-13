@@ -14,6 +14,7 @@ var cookieParser = require("cookie-parser");
 var MongooseStore = require('connect-mongo')(session);
 
 // Connect to MongoDB
+mongoose.Promise = global.Promise;
 mongoose.connect(require('./config/mongo').uri);
 
 // Express Server
@@ -30,7 +31,8 @@ app.use(session({
     resave: true,
     saveUninitialized: false,
     store: new MongooseStore({
-        mongooseConnection: mongoose.connection
+        mongooseConnection: mongoose.connection,
+        ttl: 1 * 60
     })
 }));
 
