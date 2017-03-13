@@ -86,3 +86,11 @@ Following are the list of Schema along with their attributes
 - winner : String - Could be optional, since we are storing who is the winner in the Pot
 - betTime : Date
 - betAmount : Number
+
+### Transaction
+- id : Number (unique, required)
+- from : Object [User]
+- to : String - Could be 'IPL' or 'user' (user in case of Transfer)
+- type : String - Could be 'Bet' or 'Transfer'
+- time : Date
+- amount : Number
