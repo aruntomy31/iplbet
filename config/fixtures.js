@@ -17,7 +17,7 @@ module.exports = [
         fixture: "8/4,4"
     }, {
         home: "RCB",
-        away: "DDR",
+        away: "DD",
         fixture: "8/4,8"
     }, {
         home: "SRH",
@@ -33,7 +33,7 @@ module.exports = [
         fixture: "10/4,8"
     }, {
         home: "RPS",
-        away: "DDR",
+        away: "DD",
         fixture: "11/4,8"
     }, {
         home: "MI",
@@ -56,7 +56,7 @@ module.exports = [
         away: "SRH",
         fixture: "15/4,4"
     }, {
-        home: "DDR",
+        home: "DD",
         away: "KXIP",
         fixture: "15/4,8"
     }, {
@@ -68,7 +68,7 @@ module.exports = [
         away: "RPS",
         fixture: "16/4,8"
     }, {
-        home: "DDR",
+        home: "DD",
         away: "KKR",
         fixture: "17/4,4"
     }, {
@@ -81,7 +81,7 @@ module.exports = [
         fixture: "18/4,8"
     }, {
         home: "SRH",
-        away: "DDR",
+        away: "DD",
         fixture: "19/4,8"
     }, {
         home: "KXIP",
@@ -92,7 +92,7 @@ module.exports = [
         away: "GL",
         fixture: "21/4,8"
     }, {
-        home: "DDR",
+        home: "DD",
         away: "MI",
         fixture: "22/4,4"
     }, {
@@ -125,7 +125,7 @@ module.exports = [
         fixture: "27/4,8"
     }, {
         home: "KKR",
-        away: "DDR",
+        away: "DD",
         fixture: "28/4,4"
     }, {
         home: "KXIP",
@@ -141,7 +141,7 @@ module.exports = [
         fixture: "29/4,8"
     }, {
         home: "KXIP",
-        away: "DDR",
+        away: "DD",
         fixture: "30/4,4"
     }, {
         home: "SRH",
@@ -156,7 +156,7 @@ module.exports = [
         away: "GL",
         fixture: "1/5,8"
     }, {
-        home: "DDR",
+        home: "DD",
         away: "SRH",
         fixture: "2/5,8"
     }, {
@@ -164,7 +164,7 @@ module.exports = [
         away: "RPS",
         fixture: "3/5,8"
     }, {
-        home: "DDR",
+        home: "DD",
         away: "GL",
         fixture: "4/5,8"
     }, {
@@ -177,7 +177,7 @@ module.exports = [
         fixture: "6/5,4"
     }, {
         home: "MI",
-        away: "DDR",
+        away: "DD",
         fixture: "6/5,8"
     }, {
         home: "RCB",
@@ -197,14 +197,14 @@ module.exports = [
         fixture: "9/5,8"
     }, {
         home: "GL",
-        away: "DDR",
+        away: "DD",
         fixture: "10/5,8"
     }, {
         home: "MI",
         away: "KXIP",
         fixture: "11/5,8"
     }, {
-        home: "DDR",
+        home: "DD",
         away: "RPS",
         fixture: "12/5,8"
     }, {
@@ -220,7 +220,7 @@ module.exports = [
         away: "KXIP",
         fixture: "14/5,4"
     }, {
-        home: "DDR",
+        home: "DD",
         away: "RCB",
         fixture: "14/5,8"
     }
