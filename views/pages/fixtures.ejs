@@ -14,6 +14,14 @@
         </table>
     </div>
     <script>
+        function getReadableFixture(date) {
+            var fixture = {};
+            var dd = date.getDate();
+            dd = dd < 10 ? "0" + dd : dd;
+            fixture.date = dd + "-" + months[date.getMonth()] + "-" + date.getFullYear();
+            fixture.time = date.toLocaleTimeString();
+            return fixture;
+        }
         $.ajax('/apis/matches', {
             success: function(data) {
                 data = JSON.parse(data);
@@ -32,7 +40,7 @@
                     delete match.homeTeam;
                     delete match.awayTeam;
 
-                    match.fixture = util.getReadableFixture(match.fixture);
+                    match.fixture = getReadableFixture(match.fixture);
 
                     if (match.winner && match.wonBy) {
                         match.result = {
