@@ -436,5 +436,4 @@ router.post('/place-bet', function (request, response) {
         });
     });
 });
-
 module.exports = router;
