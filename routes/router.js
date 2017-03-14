@@ -21,6 +21,14 @@ router.get('/', function (request, response) {
     });
 });
 
+router.get('/privacy', function(request, response) {
+    response.status(200).send("Privacy Policy");
+});
+
+router.get('/terms', function(request, response) {
+    response.status(200).send("Terms and Conditions");
+});
+
 router.get('/fixtures', function (request, response) {
     response.render('pages/fixtures', {
         title: 'BettingBad : Fixtures',
