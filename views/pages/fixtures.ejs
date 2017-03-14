@@ -28,6 +28,13 @@
         $.ajax('/apis/matches', {
             success: function(data) {
                 data = JSON.parse(data);
+                data.sort(function(a, b) {
+                    if (a.fixture > b.fixture) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                });
                 data.forEach(match => {
                     match.id = match._id;
                     match.home = {
