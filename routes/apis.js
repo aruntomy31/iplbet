@@ -291,34 +291,6 @@ router.get('/matches', function (request, response) {
         if (error) {
             return response.status(500).send("Unable to get fixtures.");
         }
-        matches.map(function(match){
-            match.id = match._id;
-            match.home = {
-                name: match.homeTeam.name,
-                shortName: match.homeTeam.id
-            };
-
-            match.away = {
-                name: match.awayTeam.name,
-                shortName: match.awayTeam.id
-            };
-
-            delete match.homeTeam;
-            delete match.awayTeam;
-
-            match.fixture = util.getReadableFixture(match.fixture);
-
-            if (match.winner && match.wonBy) {
-                match.result = {
-                    won: match.winner,
-                    by: match.wonBy
-                };
-
-                delete match.winner;
-                delete match.wonBy;
-                delete match.fixture;
-            }
-        });
         return response.status(200).send(JSON.stringify(matches));
     });
 });
