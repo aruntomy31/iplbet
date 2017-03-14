@@ -19,7 +19,9 @@
             date = new Date(date);
             var dd = date.getDate();
             dd = dd < 10 ? "0" + dd : dd;
-            fixture.date = dd + "-" + months[date.getMonth()] + "-" + date.getFullYear();
+            var mm = date.getMonth();
+            mm = mm < 10 ? "0" + mm : mm;
+            fixture.date = dd + "-" + mm + "-" + date.getFullYear();
             fixture.time = date.toLocaleTimeString();
             return fixture;
         }
