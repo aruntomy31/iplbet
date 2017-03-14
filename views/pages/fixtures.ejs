@@ -28,6 +28,7 @@
         $.ajax('/apis/matches', {
             success: function(data) {
                 data = JSON.parse(data);
+                console.log(data);
                 data.forEach(match => {
                     match.id = match._id;
                     match.home = {
