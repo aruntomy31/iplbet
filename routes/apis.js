@@ -263,7 +263,7 @@ router.post('/updatePlayerStats/:playerId', function (request, response) {
 router.get('/matches', function (request, response) {
     Match.find({}, function (error, matches) {
         if (error) return response.status(500).send("Unable to get fixtures.");
-        matches.forEach(match => {
+        matches.map(match => {
             match.id = match._id;
             match.home = {
                 name: match.homeTeam.name,
