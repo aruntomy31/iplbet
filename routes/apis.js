@@ -50,10 +50,14 @@ router.get('/activate/:user/:code', function (request, response) {
         id: userId,
         activateCode: code
     }, function (error, user) {
-        if (error || !user) return response.status(500).send("Activation Failed. Invalid User.");
+        if (error || !user) {
+            return response.status(500).send("Activation Failed. Invalid User.");
+        }
         user.suspended = false;
         user.save(function (error) {
-            if (error) return response.status(500).send("Activation Failed.");
+            if (error) {
+                return response.status(500).send("Activation Failed.");
+            }
             return response.status(200).send("User Activated.");
         });
     });
@@ -62,14 +66,20 @@ router.get('/activate/:user/:code', function (request, response) {
 // 4. Activate User via Admin Login
 router.post('/activate', util.ensureAuthenticated, util.checkAdmin, function (request, response) {
     var data = request.body ? JSON.parse(request.body) : undefined;
-    if (!data || !data.userId) return response.status(500).send("Provide UserId");
+    if (!data || !data.userId) {
+        return response.status(500).send("Provide UserId");
+    }
     User.findOne({
         id: data.userId
     }, function (error, user) {
-        if (error || !user) return response.status(500).send("Activation Failed. Invalid User.");
+        if (error || !user) {
+            return response.status(500).send("Activation Failed. Invalid User.");
+        }
         user.suspended = false;
         user.save(function (error) {
-            if (error) return response.status(500).send("Activation Failed.");
+            if (error) {
+                return response.status(500).send("Activation Failed.");
+            }
             return response.status(200).send("User Activated.");
         });
     });
@@ -78,14 +88,20 @@ router.post('/activate', util.ensureAuthenticated, util.checkAdmin, function (re
 // 5. Deactivate User via Admin Login
 router.post('/deactivate', util.ensureAuthenticated, util.checkAdmin, function (request, response) {
     var data = request.body ? JSON.parse(request.body) : undefined;
-    if (!data || !data.userId) return response.status(500).send("Provide UserId");
+    if (!data || !data.userId) {
+        return response.status(500).send("Provide UserId");
+    }
     User.findOne({
         id: data.userId
     }, function (error, user) {
-        if (error || !user) return response.status(500).send("Deactivation Failed. Invalid User.");
+        if (error || !user) {
+            return response.status(500).send("Deactivation Failed. Invalid User.");
+        }
         user.suspended = true;
         user.save(function (error) {
-            if (error) return response.status(500).send("Deactivation Failed.");
+            if (error) {
+                return response.status(500).send("Deactivation Failed.");
+            }
             return response.status(200).send("User Deactivated.");
         });
     });
@@ -94,18 +110,28 @@ router.post('/deactivate', util.ensureAuthenticated, util.checkAdmin, function (
 // 6. Update Balance [By Specific Amount] of All Users
 router.post('/updateBalanceBy', util.ensureAuthenticated, util.checkAdmin, function (request, response) {
     var data = request.body ? JSON.parse(request.body) : undefined;
-    if (!data || !data.amount) return response.status(500).send("Provide Amount");
-    if (data.amount <= 0) return response.status(500).send("Please enter a valid non-zero amount.");
+    if (!data || !data.amount) {
+        return response.status(500).send("Provide Amount");
+    }
+    if (data.amount <= 0) {
+        return response.status(500).send("Please enter a valid non-zero amount.");
+    }
     User.find({
         suspended: false
     }, function (error, users) {
-        if (error || !users) return response.status(500).send("Unable to fetch users.");
+        if (error || !users) {
+            return response.status(500).send("Unable to fetch users.");
+        }
         var lastUser = users[users.length - 1];
         for (var user of users) {
             user.balance = user.balance + data.amount;
             user.save(function (error, user) {
-                if (error) return response.status(500).send("Update Balance Failed.");
-                if (user._id === lastUser._id) response.status(200).send("Balance Updated for All Users.");
+                if (error) {
+                    return response.status(500).send("Update Balance Failed.");
+                }
+                if (user._id === lastUser._id) {
+                    response.status(200).send("Balance Updated for All Users.");
+                }
             });
         }
     });
@@ -262,8 +288,10 @@ router.post('/updatePlayerStats/:playerId', function (request, response) {
 // 14. List of all the matches
 router.get('/matches', function (request, response) {
     Match.find({}, function (error, matches) {
-        if (error) return response.status(500).send("Unable to get fixtures.");
-        matches.map(match => {
+        if (error) {
+            return response.status(500).send("Unable to get fixtures.");
+        }
+        matches.map(function(match){
             match.id = match._id;
             match.home = {
                 name: match.homeTeam.name,
@@ -299,7 +327,9 @@ router.get('/matches', function (request, response) {
 router.post('/update-match/:matchId', function (request, response) {
     var matchId = request.params.matchId;
     var data = request.body ? JSON.parse(request.body) : undefined;
-    if (!data || !matchId) return response.status(500).send("Please provide appropriate data");
+    if (!data || !matchId) {
+        return response.status(500).send("Please provide appropriate data");
+    }
     Match.findById(matchId, function (error, match) {
         if (error) return response.status(500).send("Unable to fetch the match.");
         match.batFirst = data.batFirst;
@@ -318,7 +348,9 @@ router.post('/update-match/:matchId', function (request, response) {
 // 16. List of all the pots
 router.get('/pots', function (request, response) {
     Pot.find({}, function (error, pots) {
-        if (error) return response.status(500).send("Unable to fetch pots.");
+        if (error) {
+            return response.status(500).send("Unable to fetch pots.");
+        }
         response.status(200).send(JSON.stringify(pots));
     });
 });
@@ -326,11 +358,15 @@ router.get('/pots', function (request, response) {
 // 17. List of all the pots for a match
 router.get('/pots/:matchId', function (request, response) {
     var matchId = request.params.matchId;
-    if (!matchId) return response.status(500).send("Please provide Match ID");
+    if (!matchId) {
+        return response.status(500).send("Please provide Match ID");
+    }
     Pot.find({
         "match._id": matchId
     }, function (error, pots) {
-        if (error) return response.status(500).send("Unable to fetch pots.");
+        if (error) {
+            return response.status(500).send("Unable to fetch pots.");
+        }
         response.status(200).send(JSON.stringify(pots));
     });
 });
@@ -346,7 +382,9 @@ router.get('/open-pots', function (request, response) {
             $gt: time
         }
     }, function (error, pots) {
-        if (error) return response.status(500).send("Unable to fetch pots.");
+        if (error) {
+            return response.status(500).send("Unable to fetch pots.");
+        }
         response.status(200).send(JSON.stringify(pots));
     });
 });
@@ -354,9 +392,13 @@ router.get('/open-pots', function (request, response) {
 // 19. Add new pot
 router.post('/add-pot', function (request, response) {
     var data = request.body ? JSON.parse(request.body) : undefined;
-    if (!data) return response.status(500).send("Please provide appropriate data");
+    if (!data) {
+        return response.status(500).send("Please provide appropriate data");
+    }
     Match.findById(data.matchId, function (error, match) {
-        if (error) return response.status(500).send("Unable to fetch the match.");
+        if (error) {
+            return response.status(500).send("Unable to fetch the match.");
+        }
         Pot.create({
             name: data.name,
             openTime: data.openTime,
@@ -364,7 +406,9 @@ router.post('/add-pot', function (request, response) {
             match: match,
             multiplier: data.multiplier
         }, function (error) {
-            if (error) return response.status(500).send("Unable to create new pot.");
+            if (error) {
+                return response.status(500).send("Unable to create new pot.");
+            }
             response.status(200).send("New Pot Created.");
         });
     });
@@ -375,7 +419,9 @@ router.post('/add-pot', function (request, response) {
 // 20. View all bets
 router.get('/bets', function (request, response) {
     Bet.find({}, function (error, bets) {
-        if (error) return response.status(500).send("Unable to fetch bets.");
+        if (error) {
+            return response.status(500).send("Unable to fetch bets.");
+        }
         response.status(200).send(JSON.stringify(bets));
     });
 });
@@ -383,11 +429,15 @@ router.get('/bets', function (request, response) {
 // 21. View all bets for a pot
 router.get('/bets/pot/:potId', function (request, response) {
     var potId = request.params.potId;
-    if (!potId) return response.status(500).send("Please provide Pot ID");
+    if (!potId) {
+        return response.status(500).send("Please provide Pot ID");
+    }
     Bet.find({
         "pot._id": potId
     }, function (error, bets) {
-        if (error) return response.status(500).send("Unable to fetch bets.");
+        if (error) {
+            return response.status(500).send("Unable to fetch bets.");
+        }
         response.status(200).send(JSON.stringify(bets));
     });
 });
@@ -395,11 +445,15 @@ router.get('/bets/pot/:potId', function (request, response) {
 // 22. View all bets for a user
 router.get('/bets/user/:userId', function (request, response) {
     var userId = request.params.userId;
-    if (!userId) return response.status(500).send("Please provide User ID");
+    if (!userId) {
+        return response.status(500).send("Please provide User ID");
+    }
     Bet.find({
         "user.id": userId
     }, function (error, bets) {
-        if (error) return response.status(500).send("Unable to fetch bets.");
+        if (error) {
+            return response.status(500).send("Unable to fetch bets.");
+        }
         response.status(200).send(JSON.stringify(bets));
     });
 });
@@ -407,9 +461,13 @@ router.get('/bets/user/:userId', function (request, response) {
 // 23. Place a new bet
 router.post('/place-bet', function (request, response) {
     var data = request.body ? JSON.parse(request.body) : undefined;
-    if (!data) return response.status(500).send("Please provide appropriate data");
+    if (!data) {
+        return response.status(500).send("Please provide appropriate data");
+    }
     Pot.findById(data.potId, function (error, pot) {
-        if (error) return response.status(500).send("Unable to fetch the pot.");
+        if (error) {
+            return response.status(500).send("Unable to fetch the pot.");
+        }
         Bet.create({
             pot: pot,
             user: request.user,
@@ -417,7 +475,9 @@ router.post('/place-bet', function (request, response) {
             betTime: new Date(),
             betAmount: data.betAmount
         }, function (error, bet) {
-            if (error) return response.status(500).send("Unable to place the bet.");
+            if (error) {
+                return response.status(500).send("Unable to place the bet.");
+            }
             var transactionId = 1;
             Transaction.findOne({
                 $query: {},
@@ -425,7 +485,9 @@ router.post('/place-bet', function (request, response) {
                     id: -1
                 }
             }, function (error, transaction) {
-                if (error) return response.status(500).send("Unable to fetch transaction record/.");
+                if (error) {
+                    return response.status(500).send("Unable to fetch transaction record/.");
+                }
             });
             Transaction.create({
 
