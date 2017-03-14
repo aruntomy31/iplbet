@@ -109,7 +109,13 @@ module.exports = function(app, passport) {
     
     app.get('/logout', function(request, response) {
         request.logout();
-        response.status(200).send("Logged Out. <br><a href='/auth/google'>Login with Google</a>");
+        
+        var output  = "Logged Out. <br>"
+            + "<a href='/auth/google'>Login with Google</a><br>"
+            + "<a href='/auth/twitter'>Login with Twitter</a><br>"
+            + "<a href='/auth/facebook'>Login with Facebook</a><br>";
+        
+        response.status(200).send(output);
     });
     
 };

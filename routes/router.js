@@ -1,12 +1,15 @@
 /*jslint node:true*/
 'use strict';
 
+var util   = require('../util');
 var router = require('express').Router();
 
 // Schema
 var User = require('../db/User');
 
 // Various Routes
+var iplRoutes   = require('./ipl');
+var apiRoutes   = require('./apis');
 var teamRoutes  = require('./team');
 var userRoutes  = require('./user');
 var adminRoutes = require('./admin');
@@ -30,40 +33,23 @@ router.get('/prizes', function(request, response) {
     response.status(200).send("Prizes Page");
 });
 
+router.use('/ipl', iplRoutes);
+
+router.use('/apis', apiRoutes);
+
 router.use('/teams', teamRoutes);
 
-router.use('/users', _ensureAuthenticated, userRoutes);
+router.use('/users', util.ensureAuthenticated, userRoutes);
 
-router.use('/admin', _ensureAuthenticated, _checkAdmin, adminRoutes);
+router.use('/admin', util.ensureAuthenticated, util.checkAdmin, adminRoutes);
 
-router.get('/login', function(request, response, next) {
-    response.status(500).send('Failed');
+router.get('/login', function(request, response) {
+    
+    var output  = "<a href='/auth/google'>Login with Google</a><br>"
+        + "<a href='/auth/twitter'>Login with Twitter</a><br>"
+        + "<a href='/auth/facebook'>Login with Facebook</a><br>";
+    
+    response.status(500).send(output);
 });
-
-// Private Functions
-function _ensureAuthenticated(request, response, next) {
-    // Check if request contains session user variable
-    if(request.isAuthenticated() === true) {
-        // -> Check if user exists in DB
-        User.find({ id : request.user.id }, function(error, user) {
-            if(error || user.length === 0) { console.log(error); response.redirect('/login'); }
-            else {
-                // User Exists
-                user = user[0];
-                if(user.admin === true && request.baseUrl === '/users') response.redirect('/admin');
-                else if(user.admin === false && request.baseUrl === '/admin') response.redirect('/users');
-                else return next();
-            }
-        });
-    } else response.redirect('/login');
-}
-
-function _checkAdmin(request, response, next) {
-    User.find({ id: request.user.id, admin: true }, function(error, user) {
-        if(error || user.length === 0) {
-            response.redirect('/login');
-        } else return next();
-    });
-}
 
 module.exports = router;

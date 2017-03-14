@@ -7,7 +7,11 @@ var User = require('../db/User');
 
 router.get('/', function(request, response) {
     // Render User Landing Page
-    response.status(200).send("User Landing Page");
+    
+    var output  = "User Dashboard. <br>"
+        + "<a href='/logout'>Logout</a><br>";
+        
+    response.status(200).send(output);
 });
 
 router.get('/profile', function(request, response) {
