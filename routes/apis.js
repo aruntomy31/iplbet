@@ -148,6 +148,7 @@ router.get('/teams/:stats', function (request, response) {
         currentPosition: 1,
         positionLastYear: 1,
         titles: 1,
+        players: 1,
         _id: 0
     };
     if (stats === "true") {
