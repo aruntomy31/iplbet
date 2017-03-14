@@ -10,54 +10,54 @@ var concat = require("concat-stream");
 function toJson(request, response, url) {
     http.get("http://datacdn.iplt20.com/dynamic/data/core/cricket/2012/ipl2016/" + url + ".js", res => {
         res.pipe(concat({ encoding: 'string' }, function(string) {
-            return string.slice(string.indexOf('(')+1, string.lastIndexOf(')'));
+            response.status(200).send(string.slice(string.indexOf('(')+1, string.lastIndexOf(')')));
         }));
     });
 }
 
 // 1. Group Standings
 router.get('/standings', function(request, response, next){
-    response.status(200).send(toJson(request, response, "groupStandings"));
+    toJson(request, response, "groupStandings");
 });
 
 // 2. Most Runs
 router.get('/most-runs', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/mostRuns"));
+    toJson(request, response, "stats/player/full/mostRuns");
 });
 
 // 3. Most Sixes
 router.get('/most-sixes', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/mostSixes"));
+    toJson(request, response, "stats/player/full/mostSixes");
 });
 
 // 4. Highest Scores
 router.get('/highest-scores', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/highestScoresInnings"));
+    toJson(request, response, "stats/player/full/highestScoresInnings");
 });
 
 // 5. Best Batting Strike Rate
 router.get('/best-batting-strike-rate', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/bestBattingStrikeRate"));
+    toJson(request, response, "stats/player/full/bestBattingStrikeRate");
 });
 
 // 6. Most Wickets
 router.get('/most-wickets', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/mostWickets"));
+    toJson(request, response, "stats/player/full/mostWickets");
 });
 
 // 7. Best Bowling Innings
 router.get('/best-bowling-innings', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/bestBowlingInnings"));
+    toJson(request, response, "stats/player/full/bestBowlingInnings");
 });
 
 // 8. Best Bowling Average
 router.get('/best-bowling-average', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/bestBowlingAverage"));
+    toJson(request, response, "stats/player/full/bestBowlingAverage");
 });
 
 // 9. Best Bowling Economy
 router.get('/best-bowling-economy', function(request, response, next){
-    response.status(200).send(toJson(request, response, "stats/player/full/bestBowlingEconomy"));
+    toJson(request, response, "stats/player/full/bestBowlingEconomy");
 });
 
 module.exports = router;

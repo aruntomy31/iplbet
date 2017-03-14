@@ -1,6 +1,6 @@
 module.exports = {
     
-    DD: {
+    DDR: {
 		name: "Delhi Daredevils",
         logo: "",
         currentPosition: 0,
