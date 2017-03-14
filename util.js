@@ -36,7 +36,7 @@ module.exports.getReadableFixture = function(date) {
     dd = dd < 10 ? "0" + dd : dd;
     fixture.date = dd + "-" + months[date.getMonth()] + "-" + date.getFullYear();
     var time = new Date(date.getTime() + 19800000);
-    fixture.time = time.toString();
+    fixture.time = time.toLocaleTimeString();
     return fixture;
 }
 
