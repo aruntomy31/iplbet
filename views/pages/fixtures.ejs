@@ -14,7 +14,7 @@
         </table>
     </div>
     <script>
-        $.ajax('/apis/matches' {
+        $.ajax('/apis/matches', {
             success: function(data) {
                 data = JSON.parse(data);
                 data.forEach(match => {
