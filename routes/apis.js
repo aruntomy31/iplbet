@@ -288,11 +288,38 @@ router.post('/updatePlayerStats/:playerId', function (request, response) {
 
 // 14. List of all the matches
 router.get('/matches', function (request, response) {
-    Match.find({}, function (error, matches) {
+    Match.find({}).sort({ fixture: 1 }).exec(function (error, matches) {
         if (error) {
             return response.status(500).send("Unable to get fixtures.");
         }
-        return response.status(200).send(JSON.stringify(matches));
+        
+        var respMatches = [];
+        matches.forEach(match => {
+            var respMatch = {
+                id : match._id,
+                home : {
+                    name : match.homeTeam.name,
+                    shortName : match.homeTeam.id
+                },
+                away : {
+                    name : match.awayTeam.name,
+                    shortName : match.awayTeam.id
+                }
+            };
+            
+            if (match.winner && match.wonBy) {
+                respMatch.result = {
+                    won: match.winner,
+                    by: match.wonBy
+                };
+            } else {
+                respMatch.fixture = util.getReadableFixture(match.fixture);
+            }
+            
+            respMatches.push(respMatch);
+        });
+        
+        return response.status(200).send(JSON.stringify(respMatches));
     });
 });
 
