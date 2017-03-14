@@ -17,7 +17,8 @@ function _createUserObject(id, name, email, image) {
         email     : email,
         image     : image ? image : "http://placehold.it/200x200",
         admin     : false,
-        suspended : true
+        suspended : true,
+        balance : 0
     });
 }
 
