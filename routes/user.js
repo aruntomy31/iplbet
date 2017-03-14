@@ -5,8 +5,8 @@ var router = require('express').Router();
 
 var User = require('../db/User');
 
-router.get('/', function(request, response) {
-    res.render('pages/users/index', {
+router.get('/', function (request, response) {
+    response.render('pages/users/index', {
         title: 'BettingBad : User Home',
         user: {
             name: request.user.name,
@@ -19,12 +19,12 @@ router.get('/', function(request, response) {
     });
 });
 
-router.get('/profile', function(request, response) {
+router.get('/profile', function (request, response) {
     // Render User Profile Page (Same as landing page?)
     response.status(200).send("User Profile Page");
 });
 
-router.get('/betzone', function(request, response) {
+router.get('/betzone', function (request, response) {
     // Two Views : Place Bets (New Bets) & Placed Bets (Old Bets)
     response.status(200).send("User Betting Zone");
 });
