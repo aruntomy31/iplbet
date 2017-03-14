@@ -16,6 +16,7 @@
     <script>
         function getReadableFixture(date) {
             var fixture = {};
+            date = new Date(date);
             var dd = date.getDate();
             dd = dd < 10 ? "0" + dd : dd;
             fixture.date = dd + "-" + months[date.getMonth()] + "-" + date.getFullYear();
