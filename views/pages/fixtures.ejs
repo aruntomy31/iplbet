@@ -19,7 +19,7 @@
             date = new Date(date);
             var dd = date.getDate();
             dd = dd < 10 ? "0" + dd : dd;
-            var mm = date.getMonth();
+            var mm = date.getMonth() + 1;
             mm = mm < 10 ? "0" + mm : mm;
             fixture.date = dd + "-" + mm + "-" + date.getFullYear();
             fixture.time = date.toLocaleTimeString();
