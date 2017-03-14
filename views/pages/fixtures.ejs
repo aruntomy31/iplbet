@@ -14,49 +14,10 @@
         </table>
     </div>
     <script>
-        function getReadableFixture(date) {
-            var fixture = {};
-            date = new Date(date);
-            var dd = date.getDate();
-            dd = dd < 10 ? "0" + dd : dd;
-            var mm = date.getMonth();
-            mm = mm < 10 ? "0" + mm : mm;
-            fixture.date = dd + "-" + mm + "-" + date.getFullYear();
-            fixture.time = date.toLocaleTimeString();
-            return fixture;
-        }
         $.ajax('/apis/matches', {
             success: function(data) {
                 data = JSON.parse(data);
                 console.log(data);
-                data.forEach(match => {
-                    match.id = match._id;
-                    match.home = {
-                        name: match.homeTeam.name,
-                        shortName: match.homeTeam.id
-                    };
-
-                    match.away = {
-                        name: match.awayTeam.name,
-                        shortName: match.awayTeam.id
-                    };
-
-                    delete match.homeTeam;
-                    delete match.awayTeam;
-
-                    match.fixture = getReadableFixture(match.fixture);
-
-                    if (match.winner && match.wonBy) {
-                        match.result = {
-                            won: match.winner,
-                            by: match.wonBy
-                        };
-
-                        delete match.winner;
-                        delete match.wonBy;
-                        delete match.fixture;
-                    }
-                });
                 var parent = document.querySelector('.ui.very.basic.collapsing.striped.celled.table tbody');
                 data.forEach(function(match) {
                     var tr = document.createElement('tr');
