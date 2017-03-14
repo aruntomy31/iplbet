@@ -28,13 +28,16 @@ function checkUserExistOrAdd(user, done) {
         { email: user.email }
     ] }, function(error, userFound) {
         if(error) return done(error, null);
-        if(!userFound) {
-            user.save(function(error, userCreated) {
-                if(error) return done(error, null);
-                return done(null, userCreated);
-            });
+        else {
+            if(!userFound) {
+                user.save(function(error, userCreated) {
+                    if(error) return done(error, null);
+                    return done(null, userCreated);
+                });
+            } else {
+                return done(null, userFound);
+            }
         }
-        return done(null, userFound);
     });
 }
 
@@ -45,12 +48,12 @@ module.exports = function(app, passport) {
     app.use(passport.session());
     
     passport.serializeUser(function(user, done) {
-        done(null, user);
+        return done(null, user);
     });
     
     passport.deserializeUser(function(user, done) {
         User.findById(user, function(error, userFound) {
-            done(error, userFound);
+            return done(error, userFound);
         });
     });
     
