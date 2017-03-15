@@ -19,11 +19,7 @@ var team = new Schema({
     players: [{
         type : Object,
         ref  : 'Player'
-    }],
-    teamStats: {
-        type : Object,
-        ref  : 'TeamStatistics'
-    }
+    }]
 });
 
 module.exports = mongoose.model('Team', team);

@@ -16,7 +16,6 @@ var match = new Schema({
         ref  : 'Team'
     },
     fixture: Date,
-    batFirst: String,
     winner: String,
     wonBy: String
 });

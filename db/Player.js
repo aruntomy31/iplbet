@@ -16,19 +16,7 @@ var player = new Schema({
         type : Object,
         ref  : 'Team'
     },
-    matches : Number,
-    battingStats: {
-        type : Object,
-        ref  : 'BattingStatistics'
-    },
-    bowlingStats: {
-        type : Object,
-        ref  : 'BowlingStatistics'
-    },
-    fieldingStats: {
-        type : Object,
-        ref  : 'FieldingStatistics'
-    }
+    matches : Number
 });
 
 module.exports = mongoose.model('Player', player);

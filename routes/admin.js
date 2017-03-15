@@ -5,17 +5,13 @@ var fs = require('fs');
 var backup = require('mongodb-backup');
 var restore = require('mongodb-restore');
 
-var util = require('../util');
 var mongo = require('../config/mongo');
 
 // Schemas
 
-var User = require('../db/User');
 var Team = require('../db/Team');
 var Match = require('../db/Match');
 var Player = require('../db/Player');
-var BattingStats = require('../db/BattingStatistics');
-var BowlingStats = require('../db/BowlingStatistics');
 
 var router = require('express').Router();
 

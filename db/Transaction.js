@@ -6,16 +6,11 @@ var Schema = mongoose.Schema;
 var Object = mongoose.Schema.Types.Object;
 
 var transaction = new Schema({
-    id: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     from: {
         type : Object,
         ref  : 'User'
     },
-    to: String,
+    to: ObjectId,
     type: String,
     time: Date,
     amount: Number

@@ -64,9 +64,9 @@ router.use('/apis', apiRoutes);
 
 router.use('/teams', teamRoutes);
 
-router.use('/users', util.ensureAuthenticated, userRoutes);
+router.use('/users', util.checkUser, userRoutes);
 
-router.use('/admin', util.ensureAuthenticated, util.checkAdmin, adminRoutes);
+router.use('/admin', util.checkAdmin, adminRoutes);
 
 router.get('/login', function (request, response) {
 

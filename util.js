@@ -5,29 +5,39 @@ var User = require('./db/User');
 
 var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
 
-module.exports.ensureAuthenticated = function(request, response, next) {
-    // Check if request contains session user variable
-    if(request.isAuthenticated() === true) {
-        // -> Check if user exists in DB
-        User.find({ id : request.user.id }, function(error, user) {
-            if(error || user.length === 0) { console.log(error); response.redirect('/login'); }
-            else {
-                // User Exists
-                user = user[0];
-                if(user.admin === true && request.baseUrl === '/users') response.redirect('/admin');
-                else if(user.admin === false && request.baseUrl === '/admin') response.redirect('/users');
-                else return next();
-            }
+module.exports.checkUser = function(request, response, next) {
+    if(request.isAuthenticated()) {
+        User.findOne({ id: request.user.id }, function(error, user) {
+            if(error) response.redirect('/login');
+            else if(user.admin === true) response.redirect('/admin');
+            else return next();
         });
-    } else response.redirect('/login');
+    } else {
+        response.redirect('/login');
+    }
+};
+
+module.exports.checkActiveUser = function(request, response, next) {
+    if(request.isAuthenticated()) {
+        User.findOne({ id: request.user.id, admin: false, suspended: false }, function(error, user) {
+            if(error) response.redirect('/login');
+            else return next();
+        });
+    } else {
+        response.redirect('/login');
+    }
 };
 
 module.exports.checkAdmin = function(request, response, next) {
-    User.find({ id: request.user.id, admin: true }, function(error, user) {
-        if(error || user.length === 0) {
-            response.redirect('/login');
-        } else return next();
-    });
+    if(request.isAuthenticated()) {
+        User.findOne({ id: request.user.id }, function(error, user) {
+            if(error) response.redirect('/login');
+            else if(user.admin === true) return next();
+            else response.redirect('/users');
+        });
+    } else {
+        response.redirect('/login');
+    }
 };
 
 module.exports.getReadableFixture = function(date) {

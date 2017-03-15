@@ -11,9 +11,21 @@ var pot = new Schema({
         required: true,
         unique: true
     },
+    displayName: {
+        type: String,
+        required: true
+    },
     openTime: Date,
     closeTime: Date,
-    multiplier: Number,
+    isTeamLevel: Boolean,
+    multiplierHome: {
+        type: Number,
+        default: 1
+    },
+    multiplierAway: {
+        type: Number,
+        default: 1
+    },
     winner: String,
     match: {
         type : Object,

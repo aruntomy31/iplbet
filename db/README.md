@@ -20,62 +20,29 @@ Following are the list of Schema along with their attributes
 - positionLastYear : Number,
 - titles : Number,
 - players : Object [Player]
-- teamStats : Object [TeamStatistics]
 
 ### Player
 - name : String,
 - photo : String,
 - team : Object [Team]
 - matches : Number
-- battingStats : Object [BattingStatistics]
-- bowlingStats : Object [BowlingStatistics]
-- fieldingStats : Object [FieldingStatistics]
-
-### BattingStatistics
-- notOuts : Number
-- runsScored : Number
-- strikeRate : Number
-- highScore : Number
-- hundreds : Number
-- fifties : Number
-- fours : Number
-- sixes : Number
-
-### BowlingStatistics
-- balls : Number
-- maidens : Number
-- runsConceded : Number
-- wickets : Number
-- bestFigures : String
-
-### FieldingStatistics
-- catches : Number
-- stumpings : Number
-- runOuts : Number
-
-### TeamStatistics
-- matches : Number
-- won : Number
-- lost : Number
-- tie : Number
-- nr : Number - No Result
-- netRR : Number
-- points : Number
 
 ### Match
 - name : String
 - homeTeam : Object [Team]
 - awayTeam : Object [Team]
 - fixture : Date - Match Date & Time
-- batFirst : String
 - winner : String
 - wonBy : String
 
 ### Pot
 - name : String (unique, required)
+- displayName : String (required)
 - openTime : Date
 - closeTime : Date
-- multiplier : Number
+- isTeamLevel : Boolean
+- multiplierHome : Number
+- multiplierAway : Number
 - winner : String
 - match : Object [Match]
 
@@ -83,14 +50,14 @@ Following are the list of Schema along with their attributes
 - pot : Object [Pot] : (required)
 - user : Object [User]
 - betOn : String
-- winner : String - Could be optional, since we are storing who is the winner in the Pot
 - betTime : Date
 - betAmount : Number
+- multiplier : Number
+- winAmount : Number
 
 ### Transaction
-- id : Number (unique, required)
 - from : Object [User]
-- to : String - Could be 'IPL' or 'user' (user in case of Transfer)
+- to : String - Could be 'match' or 'user' or 'null' (user in case of Transfer)
 - type : String - Could be 'Bet' or 'Transfer'
 - time : Date
 - amount : Number

@@ -16,9 +16,10 @@ var bet = new Schema({
         ref  : 'User'
     },
     betOn: String,
-    winner: String,
     betTime: Date,
-    betAmount: Number
+    betAmount: Number,
+    multiplier: Number,
+    winAmount: Number
 });
 
 module.exports = mongoose.model('Bet', bet);
