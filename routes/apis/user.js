@@ -7,6 +7,7 @@ var router = require('express').Router();
 // Schemas
 
 var User = require('../../db/User');
+var Transaction = require('../../db/Transaction');
 
 // 1. List of All Users [/apis/user/all]
 router.get('/all', util.checkAdmin, function (request, response) {
@@ -98,6 +99,47 @@ router.post('/deactivate', util.checkAdmin, function (request, response) {
             }
             return response.status(200).send("User Deactivated.");
         });
+    });
+});
+
+// 6. User Balance Over period of 'x' days
+router.get('/balance/:days', util.checkUser, function(request, response) {
+    var days = request.params.days;
+    if(!Number.isInteger()) return response.status(500).send("Invalid Number of Days");
+    
+    var date = new Date();
+    var startTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()-days, 5, 30, 00);
+    var endTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()+1, 4, 29, 59);
+    var oneDayInMs = 1 * 24 * 60 * 60 * 1000;
+    
+    Transaction.find({ $or: [
+        { "from.id": request.user.id },
+        { "to": request.user._id }
+    ], time: { $gte: startTime, $lte: endTime }}).sort({ time: -1 }).exec(function(error, transactions) {
+        if(error) {
+            return response.status(500).send("Unable to fetch transactions");
+        }
+        
+        var result = {
+            x: [],
+            y: []
+        };
+        
+        var x = endTime.getTime();
+        transactions.forEach(transaction => {
+            if(x >= transaction.time.getTime()) {
+                var readableDate = util.getReadableFixture(new Date(x)).date;
+                result.x.push(readableDate.slice(0, readableDate.lastIndexOf('-')));
+                if(transaction.from && transaction.from.id === request.user.id) {
+                    result.y.push(transaction.balanceFrom);
+                } else {
+                    result.y.push(transaction.balanceTo);
+                }
+                x -= oneDayInMs;
+            }
+        });
+        
+        response.status(200).send(JSON.stringify(result));
     });
 });
 

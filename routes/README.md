@@ -7,6 +7,7 @@ APIs
 3. [GET] /apis/user/activate/:user/:code - Activate User [user - userId, code - activationCode]
 4. [POST] /apis/user/activate - Activate User [admin only]
 5. [POST] /apis/user/deactivate - Deactivate User [admin only]
+6. [GET] /apis/user/balance/:days - Get balance of last ':days' days on per day basis
 
 ### Team APIs
 

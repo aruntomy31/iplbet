@@ -13,7 +13,9 @@ var transaction = new Schema({
     to: ObjectId,
     type: String,
     time: Date,
-    amount: Number
+    amount: Number,
+    balanceFrom: Number,
+    balanceTo: Number
 });
 
 module.exports = mongoose.model('Transaction', transaction);
