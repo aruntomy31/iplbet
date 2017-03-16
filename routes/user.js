@@ -1,12 +1,11 @@
 /*jslint node:true*/
 'use strict';
 
+var connection = require('../core/mysql').connection;
 var router = require('express').Router();
 
-var User = require('../db/User');
-
 router.get('/', function (request, response) {
-    Bet.find({ "user.id" : request.user.name }, function(error, bets) {
+    connection.query("SELECT `betAmount`, `winner`, `betOn`, `winAmount` FROM `bet` WHERE `user` = ?", request.user.id, function(error, bets) {
         if(error) return response.status(500).send("Unable to fetch bets.");
         
         var moneyInHand = request.user.balance ? request.user.balance : 0;
@@ -46,9 +45,15 @@ router.get('/profile', function (request, response) {
     response.status(200).send("User Profile Page");
 });
 
-router.get('/betzone', function (request, response) {
-    // Two Views : Place Bets (New Bets) & Placed Bets (Old Bets)
-    response.status(200).send("User Betting Zone");
+router.get('/betzone/:match', function (request, response) {
+    response.render('pages/users/placebet', {
+        title: 'BettingBad : Place Bet',
+        active: 'bets',
+        user: {
+            name: request.user.name,
+            betmatch : request.params['match']
+        }
+    });
 });
 
 module.exports = router;

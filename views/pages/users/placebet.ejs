@@ -1,14 +1,35 @@
 <% include ../../partials/users/header.ejs %>
-<div class="ui styled fluid accordion" style="width:90%; margin-left:5%; margin-top:20px">
-    <div class="title"><i class="dropdown icon"></i> Long Term Bets</div>
-    <div class="content">
-        
-    </div>
-    <div class="title"><i class="dropdown icon"></i> Daily Bets</div>
-    <div class="content">Daily Bets</div>
-</div>
-<script>
-$('.accordion').accordion();
-</script>
+    <% if(user.betmatch) { %>
+        <%- '<script>var matchID ="' +  user.betmatch + '";</script>' %>
+            <% } %>
+                <div class="ui styled fluid accordion" style="width:90%; margin-left:5%; margin-top:20px">
+                    <div class="title"><i class="dropdown icon"></i> Long Term Bets</div>
+                    <div class="content">
+                        LT Bets
+                    </div>
+                    <div class="active title"><i class="dropdown icon"></i> Daily Bets</div>
+                    <div class="content active">
+                        <table class="ui very basic collapsing striped celled table" style="width:90%; margin-left: 5%;">
+                            <thead>
+                                <tr>
+                                    <th>Bet Category</th>
+                                    <th>Bet On</th>
+                                    <th>Bet Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <script>
+                    $('.accordion').accordion();
+                    $.ajax('/apis/pot/match/' + matchID, {
+                        success: function (data) {
+                            console.log(JSON.parse(data));
+                        }
+                    });
 
-    <% include ../../partials/users/footer.ejs %>
+                </script>
+
+                <% include ../../partials/users/footer.ejs %>

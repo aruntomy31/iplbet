@@ -5,18 +5,13 @@ var fs = require('fs');
 var path = require("path");
 var logger = require("morgan");
 var express = require('express');
-var mongoose = require('mongoose');
 
 var passport = require('passport');
 var favicon = require("serve-favicon");
 var bodyParser = require("body-parser");
 var session = require("express-session");
 var cookieParser = require("cookie-parser");
-var MongooseStore = require('connect-mongo')(session);
-
-// Connect to MongoDB
-mongoose.Promise = global.Promise;
-mongoose.connect(require('./config/mongo').uri);
+var myStore = require('express-mysql-session')(session);
 
 // Express Server
 var app = express();
@@ -31,14 +26,14 @@ app.use(session({
     secret: 'keyboard cat',
     resave: true,
     saveUninitialized: false,
-    store: new MongooseStore({
-        mongooseConnection: mongoose.connection,
-        ttl: 1 * 60
-    })
+    store: new myStore(require('./core/mysql').config)
 }));
 
 // Authentications
-require('./config/passport')(app, passport); // Initialize Passport with Strategy and Authentication Routes
+require('./core/passport')(app, passport); // Initialize Passport with Strategy and Authentication Routes
+
+// Initialize Database, Teams, Players
+require('./core/init')();
 
 // Route Definitions
 var router = require('./routes/router');

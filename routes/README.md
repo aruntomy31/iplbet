@@ -11,9 +11,9 @@ APIs
 
 ### Team APIs
 
-1. [GET] /apis/team/all - List of all teams
+1. [GET] /apis/team/all - List of all teams ???????? NEED OF PLAYERS => Can be found via Player APIs ????????
 2. [GET] /apis/team/match/:matchId - List of teams involved in a match [matchId - ObjectId of match]
-3. [GET] /apis/team/:team - Details of specific team [team - Team Short Name (all caps)]
+3. [GET] /apis/team/:team - Details of specific team [team - Team Short Name (all caps)] ???????? NEED OF PLAYERS ????????
 
 ### Player APIs
 

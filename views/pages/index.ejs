@@ -20,7 +20,7 @@
     <div class="ui link four cards segment">
     </div>
     <script>
-        $.ajax('/apis/teams/false', {
+        $.ajax('/apis/team/all', {
             success: function(data) {
                 data = JSON.parse(data);
                 data = shuffle(data);
@@ -32,7 +32,7 @@
                     var imagediv = document.createElement('div');
                     imagediv.setAttribute('class', 'image');
                     var image = document.createElement('img');
-                    image.setAttribute('src', 'images/' + team.id.toLowerCase() + '.png');
+                    image.setAttribute('src', '/images/' + team.id.toLowerCase() + '.png');
                     imagediv.appendChild(image);
 
                     var contentdiv = document.createElement('div');

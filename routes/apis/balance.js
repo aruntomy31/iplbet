@@ -1,12 +1,9 @@
 /*jslint node:true*/
 'use strict';
 
-var util = require('../../util');
+var util = require('../../core/util');
+var connection = require('../../core/mysql').connection;
 var router = require('express').Router();
-
-// Schemas
-
-var User = require('../../db/User');
 
 // 1. Update Balance [By Specific Amount] of All Users [/apis/balance/update/all]
 router.post('/update/all', util.checkAdmin, function (request, response) {
@@ -17,6 +14,9 @@ router.post('/update/all', util.checkAdmin, function (request, response) {
     
     // Validate Data... and implement RollBack
     
+    // ================== RETHINK LOGIC ==================
+    
+    /*
     if (data.amount <= 0) {
         return response.status(500).send("Please enter a valid non-zero amount.");
     }
@@ -36,6 +36,7 @@ router.post('/update/all', util.checkAdmin, function (request, response) {
         }
         return response.status(200).send("Balance Updated for All Users.");
     });
+    */
 });
 
 // 2. Update Balance of One User [Only by Admin] [/apis/balance/update/user/:user]
@@ -47,6 +48,9 @@ router.post('/update/user/:user', util.checkAdmin, function(request, response) {
     
     // Validate Data... and implement RollBack
     
+    // ================== RETHINK LOGIC ==================
+    
+    /*
     if (data.amount <= 0) {
         return response.status(500).send("Please enter a valid non-zero amount.");
     }
@@ -63,6 +67,7 @@ router.post('/update/user/:user', util.checkAdmin, function(request, response) {
             response.status(200).send("Balance Updated for the user.");
         });
     });
+    */
 });
 
 // 3. Transfer Funds [/apis/balance/transfer]
@@ -74,6 +79,9 @@ router.post('/transfer', util.checkActiveUser, function(request, response) {
     
     // Validate Data... and implement RollBack
     
+    // ================== RETHINK LOGIC ==================
+    
+    /*
     User.find({ $or: [
         { id: data.to.id },
         { id: request.user.id }
@@ -103,7 +111,7 @@ router.post('/transfer', util.checkActiveUser, function(request, response) {
         });
         
     });
-    
+    */
 });
 
 module.exports = router;

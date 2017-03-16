@@ -14,7 +14,7 @@
         </table>
     </div>
     <script>
-        $.ajax('/apis/matches', {
+        $.ajax('/apis/match/all', {
             success: function(data) {
                 data = JSON.parse(data);
                 var parent = document.querySelector('.ui.very.basic.collapsing.striped.celled.table tbody');

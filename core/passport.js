@@ -1,6 +1,8 @@
 /*jslint node:true*/
 
+var mailer = require('./mailer');
 var configuration = require('./auth');
+var connection = require('./mysql').connection;
 
 var Strategy = {
     Google   : require('passport-google-oauth').OAuth2Strategy,
@@ -8,35 +10,38 @@ var Strategy = {
     Twitter  : require('passport-twitter').Strategy
 };
 
-var User = require('../db/User');
-
 function _createUserObject(id, name, email, image) {
-    return new User({
+    return {
         id        : id,
         name      : name,
         email     : email,
         image     : image ? image : "http://placehold.it/200x200",
-        admin     : false,
-        suspended : true,
-        balance : 0
-    });
+        activateCode : Math.random().toString(36).slice(2)
+    };
 }
 
 function checkUserExistOrAdd(user, done) {
-    User.findOne({ $or : [
-        { id: user.id },
-        { email: user.email }
-    ] }, function(error, userFound) {
-        if(error) return done(error, null);
+    connection.beginTransaction(function(error) {
+        if(error) return done(error);
         else {
-            if(!userFound) {
-                user.save(function(error, userCreated) {
-                    if(error) return done(error, null);
-                    return done(null, userCreated);
-                });
-            } else {
-                return done(null, userFound);
+        connection.query("SELECT `id` FROM `user` WHERE `id` = ?", user.id, function(error, results) {
+            if(error) return done(error);
+            else if(results.length === 1) return done(null, results[0]);
+            else {
+            connection.query("INSERT INTO `user` (`id`, `name`, `email`, `photoURL`, `activateCode`) VALUES (?, ?, ?, ?, ?)",
+                            [ user.id, user.name, user.email, user.image, user.activateCode ], function(error, results) {
+                if(error) {
+                    connection.rollback(function() { console.log("Unable to insert user: " + error); });
+                    return done(error);
+                } else {
+                    mailer.mail('ahardik93@gmail.com', 'Activate User: ' + user.name,
+                            'Activate User: <a href="iplbet.herokuapp.com/apis/user/activate/' + user.id + '/' + user.activateCode + '">' + user.name + '</a>');
+
+                    done(null, user);
+                }
+            });
             }
+        });
         }
     });
 }
@@ -48,12 +53,13 @@ module.exports = function(app, passport) {
     app.use(passport.session());
     
     passport.serializeUser(function(user, done) {
-        return done(null, user);
+        return done(null, user.id);
     });
     
     passport.deserializeUser(function(user, done) {
-        User.findById(user, function(error, userFound) {
-            return done(error, userFound);
+        connection.query("SELECT * FROM `user` WHERE `id` = ?", user, function(error, results) {
+            if(error) return done(error);
+            else return done(null, results[0]);
         });
     });
     
@@ -62,7 +68,7 @@ module.exports = function(app, passport) {
         clientSecret : configuration.google.clientSecret,
         callbackURL  : configuration.google.callbackURL
     }, function(token, refreshToken, user, done) {
-        checkUserExistOrAdd(_createUserObject(user.id, user.name.givenName + ' ' + user.name.familyName, user.emails[0].value, user.photos[0].value), done);
+        checkUserExistOrAdd(_createUserObject(user.id, user.displayName, user.emails[0].value, user.photos[0].value), done);
     }));
     
     passport.use(new Strategy.Facebook({
@@ -85,7 +91,7 @@ module.exports = function(app, passport) {
     
     var redirect = {
         successRedirect: '/users',
-        failureRedirect: '/login'
+        failureRedirect: '/error'
     };
     
     var redirectIfAuthenticated = function(request, response, next) {
@@ -113,13 +119,7 @@ module.exports = function(app, passport) {
     
     app.get('/logout', function(request, response) {
         request.logout();
-        
-        var output  = "Logged Out. <br>"
-            + "<a href='/auth/google'>Login with Google</a><br>"
-            + "<a href='/auth/twitter'>Login with Twitter</a><br>"
-            + "<a href='/auth/facebook'>Login with Facebook</a><br>";
-        
-        response.status(200).send(output);
+        response.redirect('/');
     });
     
 };

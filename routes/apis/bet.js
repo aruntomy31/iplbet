@@ -1,50 +1,33 @@
 /*jslint node:true*/
 'use strict';
 
-var util = require('../../util');
+var util = require('../../core/util');
+var connection = require('../../core/mysql').connection;
 var router = require('express').Router();
-
-// Schemas
-
-var User = require('../../db/User');
-var Bet = require('../../db/Bet');
-var Pot = require('../../db/Pot');
 
 // 1. View all bets [/apis/bet/all]
 router.get('/all', util.checkAdmin, function (request, response) {
-    Bet.find({}, function (error, bets) {
-        if (error) {
-            return response.status(500).send("Unable to fetch bets.");
-        }
-        response.status(200).send(JSON.stringify(bets));
+    connection.query("SELECT * FROM `bet`", function(error, bets) {
+        if(error) return response.status(500).send("Unable to fetch bets.");
+        return response.status(200).send(JSON.stringify(bets));
     });
 });
 
 // 2. View all bets for a pot [/apis/bet/pot/:potId]
 router.get('/pot/:potId', util.checkAdmin, function (request, response) {
     var potId = request.params.potId;
-    if (!potId) {
-        return response.status(500).send("Please provide Pot ID");
-    }
-    Bet.find({
-        "pot._id": potId
-    }, function (error, bets) {
-        if (error) {
-            return response.status(500).send("Unable to fetch bets.");
-        }
-        response.status(200).send(JSON.stringify(bets));
+    if(!potId) return response.status(500).send("Please provide Pot ID");
+    connection.query("SELECT * FROM `bet` WHERE `pot` = ?", potId, function(error, bets) {
+        if(error) return response.status(500).send("Unable to fetch bets.");
+        return response.status(200).send(JSON.stringify(bets));
     });
 });
 
 // 3. View all bets for a user [/apis/bet/user]
 router.get('/user', util.checkUser, function (request, response) {
-    Bet.find({
-        "user.id": request.user.id
-    }, function (error, bets) {
-        if (error) {
-            return response.status(500).send("Unable to fetch bets.");
-        }
-        response.status(200).send(JSON.stringify(bets));
+    connection.query("SELECT * FROM `bet` WHERE `user` = ?", request.user.id, function(error, bets) {
+        if(error) return response.status(500).send("Unable to fetch bets.");
+        return response.status(200).send(JSON.stringify(bets));
     });
 });
 
@@ -57,6 +40,9 @@ router.post('/place', util.checkActiveUser, function (request, response) {
     
     // Validate Data... and implement RollBack
     
+    // ================== RETHINK LOGIC ==================
+    
+    /*
     Pot.findById(data.potId, function (error, pot) {
         if (error) {
             return response.status(500).send("Unable to fetch the pot.");
@@ -100,6 +86,7 @@ router.post('/place', util.checkActiveUser, function (request, response) {
             });
         });
     });
+    */
 });
 
 module.exports = router;

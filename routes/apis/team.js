@@ -1,17 +1,15 @@
 /*jslint node:true*/
 'use strict';
 
-var util = require('../../util');
+var util = require('../../core/util');
+var connection = require('../../core/mysql').connection;
 var router = require('express').Router();
-
-// Schemas
-
-var Team = require('../../db/Team');
-var Match = require('../../db/Match');
 
 // 1. List of All Teams [/apis/team/all]
 router.get('/all', function (request, response) {
-    Team.find({}, { id: 1, name: 1, currentPosition: 1, positionLastYear: 1, titles: 1, players: 1, _id: 0 }, function (error, teams) {
+    // captain...
+    connection.query("SELECT `id`, `name`, `positionLastYear`, `titles`, `id` AS shortName FROM `team`", function(error, teams) {
+        if(error) response.status(500).send("Unable to fetch teams.");
         response.status(200).send(JSON.stringify(teams));
     });
 });
@@ -20,16 +18,12 @@ router.get('/all', function (request, response) {
 router.get('/match/:matchId', function(request, response) {
     var matchId = request.params.matchId;
     if (!matchId) return response.status(500).send("Please provide Match ID");
-    Match.findById(matchId, function (error, match) {
-        if (error || !match) return response.status(500).send("Unable to fetch the match.");
+    
+    connection.query("SELECT m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND m.`id` = ?", matchId, function(error, match) {
+        if (error) return response.status(500).send("Unable to fetch the match.");
         var teams = [
-            {
-                id: match.homeTeam.id,
-                name: match.homeTeam.name
-            }, {
-                id: match.awayTeam.id,
-                name: match.awayTeam.name
-            }
+            { id: match[0].htsn, name: match[0].htn },
+            { id: match[0].atsn, name: match[0].atn }
         ];
         response.status(200).send(JSON.stringify(teams));
     });
@@ -39,8 +33,9 @@ router.get('/match/:matchId', function(request, response) {
 router.get('/:team', function (request, response) {
     var team = request.params.team;
     if (!team) return response.status(500).send("Provide Team Short Name");
-    Team.findOne({ "id": team }, { id: 1, name: 1, positionLastYear: 1, titles: 1, players: 1, _id: 0 }, function (error, team) {
-        if (error || !team) return response.status(500).send("Invalid Team");
+    
+    connection.query("SELECT `name`, `positionLastYear`, `titles` FROM `team` WHERE `id` = ?", team, function(error, team) {
+        if (error) return response.status(500).send("Invalid Team");
         response.status(200).send(JSON.stringify(team));
     });
 });

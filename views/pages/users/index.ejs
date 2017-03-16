@@ -1,92 +1,9 @@
 <% include ../../partials/users/header.ejs %>
-    <script>
-        var upcomingMatches = [{
-            id: 1,
-            home: {
-                name: 'Sun Risers Hyderabad',
-                shortName: 'SRH'
-            },
-            away: {
-                name: 'Royal Challengers Bangalore',
-                shortName: 'RCB'
-            },
-            fixture: {
-                date: '05-04-2017',
-                time: '08:00 PM'
-            }
-        }, {
-            id: 2,
-            home: {
-                name: 'Rising Pune Supergiants',
-                shortName: 'RPS'
-            },
-            away: {
-                name: 'Mumbai Indians',
-                shortName: 'MI'
-            },
-            fixture: {
-                date: '06-04-2017',
-                time: '08:00 PM'
-            }
-        }, {
-            id: 3,
-            home: {
-                name: 'Gujarat Lions',
-                shortName: 'GL'
-            },
-            away: {
-                name: 'Kolkata Knight Riders',
-                shortName: 'KKR'
-            },
-            fixture: {
-                date: '07-04-2017',
-                time: '08:00 PM'
-            }
-        }, {
-            id: 4,
-            home: {
-                name: 'Kings XI Punjab',
-                shortName: 'KXIP'
-            },
-            away: {
-                name: 'Rising Pune Supergiants',
-                shortName: 'RPS'
-            },
-            fixture: {
-                date: '08-04-2017',
-                time: '04:00 PM'
-            }
-        }, {
-            id: 5,
-            home: {
-                name: 'Royal Challengers Bangalore',
-                shortName: 'RCB'
-            },
-            away: {
-                name: 'Delhi Daredevils',
-                shortName: 'DD'
-            },
-            fixture: {
-                date: '08-04-2017',
-                time: '08:00 PM'
-            }
-        }, {
-            id: 6,
-            home: {
-                name: 'Royal Challengers Bangalore',
-                shortName: 'RCB'
-            },
-            away: {
-                name: 'Delhi Daredevils',
-                shortName: 'DD'
-            },
-            fixture: {
-                date: '08-04-2017',
-                time: '08:00 PM'
-            }
-        }];
-
-    </script>
+    <style>
+        .statistic {
+            width: 100%;
+        }
+    </style>
     <div class="ui cards segment" style="width:90%; margin-left:5%; margin-top:20px;">
         <div class="ui centered card">
             <div class="content">
@@ -129,7 +46,7 @@
             </div>
         </div>
     </div>
-    <div class="ui segment" style="width:44% !important; margin-right: 5%; margin-top:2%; float: right;">
+    <div class="ui segment" style="width:44% !important; margin-right: 5%; margin-top:2%; float: right; overflow: scroll; height:50% !important;">
         <div class="ui header">Bet on Upcoming Matches</div>
         <table class="ui very basic collapsing selectable celled table" style="width:90%; margin-left:5%;">
             <thead>
@@ -177,79 +94,83 @@
                 }
             }
         });
-
     </script>
     <script>
-        var parent = document.querySelector('.ui.very.basic.collapsing.selectable.celled.table tbody');
-        upcomingMatches.forEach(function(match) {
-            var tr = document.createElement('tr');
-            tr.setAttribute('id', match.id);
-            tr.setAttribute('style', 'cursor:pointer');
-            tr.addEventListener('click', function(oEvent){
-                console.log(oEvent.currentTarget.id);
-            });
+        $.ajax('/apis/match/undeclared', {
+            success: function (data) {
+                var upcomingMatches = JSON.parse(data);
+                var parent = document.querySelector('.ui.very.basic.collapsing.selectable.celled.table tbody');
+                for (var i = 0; i < upcomingMatches.length; i++) {
+                    var match = upcomingMatches[i];
+                    var tr = document.createElement('tr');
+                    tr.setAttribute('id', match.id);
+                    tr.setAttribute('style', 'cursor:pointer');
+                    tr.addEventListener('click', function (oEvent) {
+                        console.log(oEvent.currentTarget.id);
+                    });
 
-            var tdHome = document.createElement('td');
-            tdHome.setAttribute('style', 'text-align:right !important');
-            var h4Home = document.createElement('h4');
-            h4Home.setAttribute('class', 'ui image header');
-            var divHomeContent = document.createElement('div');
-            divHomeContent.setAttribute('class', 'content');
-            divHomeContent.appendChild(document.createTextNode(match.home.shortName));
-            var divHomeSubHeader = document.createElement('div');
-            divHomeSubHeader.setAttribute('class', 'sub header');
-            divHomeSubHeader.textContent = match.home.name;
-            divHomeContent.appendChild(divHomeSubHeader);
-            var imgHome = document.createElement('img');
-            imgHome.setAttribute('src', 'images/' + match.home.shortName.toLowerCase() + '.png');
-            imgHome.setAttribute('class', 'ui mini rounded image');
-            imgHome.setAttribute('style', 'padding-left: 5px');
-            h4Home.appendChild(divHomeContent);
-            h4Home.appendChild(imgHome);
-            tdHome.appendChild(h4Home);
+                    var tdHome = document.createElement('td');
+                    tdHome.setAttribute('style', 'text-align:right !important');
+                    var h4Home = document.createElement('h4');
+                    h4Home.setAttribute('class', 'ui image header');
+                    var divHomeContent = document.createElement('div');
+                    divHomeContent.setAttribute('class', 'content');
+                    divHomeContent.appendChild(document.createTextNode(match.home.shortName));
+                    var divHomeSubHeader = document.createElement('div');
+                    divHomeSubHeader.setAttribute('class', 'sub header');
+                    divHomeSubHeader.textContent = match.home.name;
+                    divHomeContent.appendChild(divHomeSubHeader);
+                    var imgHome = document.createElement('img');
+                    imgHome.setAttribute('src', '/images/' + match.home.shortName.toLowerCase() + '.png');
+                    imgHome.setAttribute('class', 'ui mini rounded image');
+                    imgHome.setAttribute('style', 'padding-left: 5px');
+                    h4Home.appendChild(divHomeContent);
+                    h4Home.appendChild(imgHome);
+                    tdHome.appendChild(h4Home);
 
-            var tdMiddle = document.createElement('td');
-            var h4Middle = document.createElement('h4');
-            h4Middle.setAttribute('class', 'ui header');
-            h4Middle.setAttribute('style', 'text-align: center !important');
-            var divMiddleContent = document.createElement('div');
-            divMiddleContent.setAttribute('class', 'content');
-            var divMiddleSubHeader = document.createElement('div');
-            divMiddleSubHeader.setAttribute('class', 'sub header');
-            if (match.result) {
-                divMiddleContent.appendChild(document.createTextNode(match.result.won + ' won'));
-                divMiddleSubHeader.textContent = 'by ' + match.result.by;
-            } else {
-                divMiddleContent.appendChild(document.createTextNode(match.fixture.date));
-                divMiddleSubHeader.textContent = match.fixture.time;
+                    var tdMiddle = document.createElement('td');
+                    var h4Middle = document.createElement('h4');
+                    h4Middle.setAttribute('class', 'ui header');
+                    h4Middle.setAttribute('style', 'text-align: center !important');
+                    var divMiddleContent = document.createElement('div');
+                    divMiddleContent.setAttribute('class', 'content');
+                    var divMiddleSubHeader = document.createElement('div');
+                    divMiddleSubHeader.setAttribute('class', 'sub header');
+                    if (match.result) {
+                        divMiddleContent.appendChild(document.createTextNode(match.result.won + ' won'));
+                        divMiddleSubHeader.textContent = 'by ' + match.result.by;
+                    } else {
+                        divMiddleContent.appendChild(document.createTextNode(match.fixture.date));
+                        divMiddleSubHeader.textContent = match.fixture.time;
+                    }
+                    divMiddleContent.appendChild(divMiddleSubHeader);
+                    h4Middle.appendChild(divMiddleContent);
+                    tdMiddle.appendChild(h4Middle);
+
+                    var tdAway = document.createElement('td');
+                    var h4Away = document.createElement('h4');
+                    h4Away.setAttribute('class', 'ui image header');
+                    var divAwayContent = document.createElement('div');
+                    divAwayContent.setAttribute('class', 'content');
+                    divAwayContent.appendChild(document.createTextNode(match.away.shortName));
+                    var divAwaySubHeader = document.createElement('div');
+                    divAwaySubHeader.setAttribute('class', 'sub header');
+                    divAwaySubHeader.textContent = match.away.name;
+                    divAwayContent.appendChild(divAwaySubHeader);
+                    var imgAway = document.createElement('img');
+                    imgAway.setAttribute('src', '/images/' + match.away.shortName.toLowerCase() + '.png');
+                    imgAway.setAttribute('class', 'ui mini rounded image');
+                    h4Away.appendChild(imgAway);
+                    h4Away.appendChild(divAwayContent);
+                    tdAway.appendChild(h4Away);
+
+                    tr.appendChild(tdHome);
+                    tr.appendChild(tdMiddle);
+                    tr.appendChild(tdAway);
+
+                    parent.appendChild(tr);
+                }
             }
-            divMiddleContent.appendChild(divMiddleSubHeader);
-            h4Middle.appendChild(divMiddleContent);
-            tdMiddle.appendChild(h4Middle);
-
-            var tdAway = document.createElement('td');
-            var h4Away = document.createElement('h4');
-            h4Away.setAttribute('class', 'ui image header');
-            var divAwayContent = document.createElement('div');
-            divAwayContent.setAttribute('class', 'content');
-            divAwayContent.appendChild(document.createTextNode(match.away.shortName));
-            var divAwaySubHeader = document.createElement('div');
-            divAwaySubHeader.setAttribute('class', 'sub header');
-            divAwaySubHeader.textContent = match.away.name;
-            divAwayContent.appendChild(divAwaySubHeader);
-            var imgAway = document.createElement('img');
-            imgAway.setAttribute('src', 'images/' + match.away.shortName.toLowerCase() + '.png');
-            imgAway.setAttribute('class', 'ui mini rounded image');
-            h4Away.appendChild(imgAway);
-            h4Away.appendChild(divAwayContent);
-            tdAway.appendChild(h4Away);
-
-            tr.appendChild(tdHome);
-            tr.appendChild(tdMiddle);
-            tr.appendChild(tdAway);
-
-            parent.appendChild(tr);
         });
-
     </script>
     <% include ../../partials/users/footer.ejs %>

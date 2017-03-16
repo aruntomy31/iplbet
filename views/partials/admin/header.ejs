@@ -4,10 +4,10 @@
     <%= title %>
 </title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="/stylesheets/semantic.min.css">
-<script src="/scripts/jquery-3.1.1.min.js"></script>
-<script src="/scripts/semantic.min.js"></script>
-<script src="/scripts/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheets/semantic.min.css">
+<script src="scripts/jquery-3.1.1.min.js"></script>
+<script src="scripts/semantic.min.js"></script>
+<script src="scripts/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
 <style>
 .ui.link.cards.segment{
@@ -19,15 +19,20 @@
 <body>
     <div class="ui pointing menu" style="margin-top:0;">
         <div class="header item">
-            <img src="/images/BeBa.png" style="height:30px"/>
+            <img src="images/BeBa.png" style="height:30px"/>
         </div>
-        <a class="<% if(active === 'home'){ %> <%= 'active' %> <% } %> item" href="/users/">Home</a>
-        <div class="ui dropdown <% if(active === 'information'){ %> <%= 'active' %> <% } %> item">Information<i class="dropdown icon"></i>
+        <a class="<% if(active === 'home'){ %> <%= 'active' %> <% } %> item" href="/admin/">Home</a>
+        <div class="ui dropdown <% if(active === 'init'){ %> <%= 'active' %> <% } %> item">Initialize<i class="dropdown icon"></i>
             <div class="menu">
-                <div class="item"><a href="/users/rules">Rules</a></div>
+                <div class="item"><a href="/users/rules">Teams and Players</a></div>
                 <div class="item"><a href="/users/fixtures">Fixtures</a></div>
-                <div class="item"><a href="/users/prizes">Prizes</a></div>
-                <div class="item"><a href="/users/stats">Statistics</a></div>
+            </div>
+        </div>
+        <div class="ui dropdown <% if(active === 'safe'){ %> <%= 'active' %> <% } %> item">Safety<i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item"><a href="/users/prizes">Backup DB</a></div>
+                <div class="item"><a href="/users/prizes">Download Backup</a></div>
+                <div class="item"><a href="/users/stats">Restore DB</a></div>
             </div>
         </div>
         <div class="ui dropdown <% if(active === 'bets'){ %> <%= 'active' %> <% } %> item">Bets<i class="dropdown icon"></i>
@@ -43,4 +48,4 @@
             </div>
         </div>
     </div>
-    <div class="ui center aligned container"><img src="/images/BeBa.png" style="height:100px;"/></div>
+    <div class="ui center aligned container"><img src="images/BeBa.png" style="height:100px;"/></div>
