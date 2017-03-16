@@ -8,7 +8,7 @@ var router = require('express').Router();
 // 1. List of All Teams [/apis/team/all]
 router.get('/all', function (request, response) {
     // captain...
-    connection.query("SELECT `id`, `name`, `positionLastYear`, `titles`, `id` AS shortName FROM `team`", function(error, teams) {
+    connection.query("SELECT t.`id`, t.`name`, t.`positionLastYear`, t.`titles`, t.`id` AS shortName, p.`name` AS captain FROM `team` t, `player` p WHERE p.`id` IN ( SELECT MIN(pl.`id`) FROM `player` pl WHERE pl.`team` = t.`id` )", function(error, teams) {
         if(error) response.status(500).send("Unable to fetch teams.");
         response.status(200).send(JSON.stringify(teams));
     });

@@ -45,7 +45,7 @@ function _initializeData() {
 
             for(var key in teams) {
                 _teamQueryValues.push([ key, teams[key].name, teams[key].positionLastYear, teams[key].titles ]);
-                for(var player in teams[key].players) {
+                for(var player of teams[key].players) {
                     _playerQueryValues.push([ player, key ]);
                 }
             }

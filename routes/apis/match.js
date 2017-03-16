@@ -36,7 +36,7 @@ function _formatMatches(matches) {
 
 // 1. List of all the matches [/apis/match/all]
 router.get('/all', function (request, response) {
-    connection.query("SELECT m.`id` AS id, m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn, m.`winner` AS winner, m.`wonBy` AS wonby FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` ORDER BY `fixture`", function(error, matches) {
+    connection.query("SELECT m.`id` AS id, m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn, m.`fixture` AS fixture, m.`winner` AS winner, m.`wonBy` AS wonby FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` ORDER BY `fixture`", function(error, matches) {
         if(error) return response.status(500).send("Unable to get fixtures.");
         return response.status(200).send(JSON.stringify(_formatMatches(matches)));
     });
@@ -44,7 +44,7 @@ router.get('/all', function (request, response) {
 
 // 2. List of all the undeclared matches [/apis/match/undeclared]
 router.get('/undeclared', function (request, response) {
-    connection.query("SELECT m.`id` AS id, m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND m.`winner` IS NULL ORDER BY `fixture`", function(error, matches) {
+    connection.query("SELECT m.`id` AS id, m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn, m.`fixture` AS fixture FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND m.`winner` IS NULL ORDER BY `fixture`", function(error, matches) {
         if(error) return response.status(500).send("Unable to get fixtures.");
         return response.status(200).send(JSON.stringify(_formatMatches(matches)));
     });

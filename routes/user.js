@@ -5,8 +5,8 @@ var connection = require('../core/mysql').connection;
 var router = require('express').Router();
 
 router.get('/', function (request, response) {
-    connection.query("SELECT `betAmount`, `winner`, `betOn`, `winAmount` FROM `bet` WHERE `user` = ?", request.user.id, function(error, bets) {
         if(error) return response.status(500).send("Unable to fetch bets.");
+    connection.query("SELECT b.`betAmount`, p.`winner`, b.`betOn`, b.`winAmount` FROM `bet` b, `pot` p WHERE b.`pot` = p.`id` AND b.`user` = ?", request.user.id, function(error, bets) {
         
         var moneyInHand = request.user.balance ? request.user.balance : 0;
         var moneyInBet = 0;
