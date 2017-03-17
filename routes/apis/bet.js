@@ -7,7 +7,7 @@ var router = require('express').Router();
 
 // 1. View all bets [/apis/bet/all]
 router.get('/all', util.checkAdmin, function (request, response) {
-    connection.query("SELECT * FROM `bet`", function(error, bets) {
+    connection.query("SELECT u.`name`, p.`displayName` AS potName, b.`betOn` AS betOn, b.`betTeam` AS betIcon, b.`betAmount` AS betAmount, b.`betTime` AS betDate, (CASE b.`winner` WHEN b.`betOn` THEN CONCAT('Won ', b.`winAmount`) ELSE CONCAT('Lost ', b.`betAmount`) END) AS result, u.`balance` FROM `bet` b, `user` u, `match` m, `pot` p WHERE b.`user` = u.`id` AND b.`match` = m.`id` AND b.`pot` = p.`id` ORDER BY u.`name`, m.`fixture`, p.`displayName`, b.`betTime`", function(error, bets) {
         if(error) return response.status(500).send("Unable to fetch bets.");
         return response.status(200).send(JSON.stringify(bets));
     });
@@ -17,7 +17,7 @@ router.get('/all', util.checkAdmin, function (request, response) {
 router.get('/pot/:potId', util.checkAdmin, function (request, response) {
     var potId = request.params.potId;
     if(!potId) return response.status(500).send("Please provide Pot ID");
-    connection.query("SELECT * FROM `bet` WHERE `pot` = ?", potId, function(error, bets) {
+    connection.query("SELECT u.`name`, p.`displayName` AS potName, b.`betOn` AS betOn, b.`betTeam` AS betIcon, b.`betAmount` AS betAmount, b.`betTime` AS betDate, (CASE b.`winner` WHEN b.`betOn` THEN CONCAT('Won ', b.`winAmount`) ELSE CONCAT('Lost ', b.`betAmount`) END) AS result, u.`balance` FROM `bet` b, `user` u, `match` m, `pot` p WHERE b.`user` = u.`id` AND b.`match` = m.`id` AND b.`pot` = p.`id` AND b.`pot` = ? ORDER BY u.`name`, m.`fixture`, p.`displayName`, b.`betTime`", potId, function(error, bets) {
         if(error) return response.status(500).send("Unable to fetch bets.");
         return response.status(200).send(JSON.stringify(bets));
     });
@@ -25,7 +25,7 @@ router.get('/pot/:potId', util.checkAdmin, function (request, response) {
 
 // 3. View all bets for a user [/apis/bet/user]
 router.get('/user', util.checkUser, function (request, response) {
-    connection.query("SELECT * FROM `bet` WHERE `user` = ?", request.user.id, function(error, bets) {
+    connection.query("SELECT p.`displayName` AS potName, b.`betOn` AS betOn, b.`betTeam` AS betIcon, b.`betAmount` AS betAmount, b.`betTime` AS betDate, (CASE b.`winner` WHEN b.`betOn` THEN CONCAT('Won ', b.`winAmount`) ELSE CONCAT('Lost ', b.`betAmount`) END) AS result FROM `bet` b, `match` m, `pot` p WHERE b.`match` = m.`id` AND b.`pot` = p.`id` AND `user` = ? ORDER BY m.`fixture`, p.`displayName`, b.`betTime`", request.user.id, function(error, bets) {
         if(error) return response.status(500).send("Unable to fetch bets.");
         return response.status(200).send(JSON.stringify(bets));
     });

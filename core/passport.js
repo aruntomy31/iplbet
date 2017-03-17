@@ -34,10 +34,17 @@ function checkUserExistOrAdd(user, done) {
                     connection.rollback(function() { console.log("Unable to insert user: " + error); });
                     return done(error);
                 } else {
-                    mailer.mail('ahardik93@gmail.com', 'Activate User: ' + user.name,
+                    connection.commit(function(error) {
+                        if(error) {
+                            connection.rollback(function() { console.log("Unable to commit: " + error) });
+                            return done(error);
+                        }
+                        
+                        mailer.mail('ahardik93@gmail.com', 'Activate User: ' + user.name,
                             'Activate User: <a href="iplbet.herokuapp.com/apis/user/activate/' + user.id + '/' + user.activateCode + '">' + user.name + '</a>');
-
-                    done(null, user);
+                        
+                        done(null, user);
+                    });
                 }
             });
             }

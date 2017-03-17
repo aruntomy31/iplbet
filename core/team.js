@@ -2,8 +2,6 @@ module.exports = {
     
     DD: {
 		name: "Delhi Daredevils",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 6,
         titles: 0,
 		players: [ "Zaheer Khan", "Ankit Bawne", "Khaleel Ahmed", "Corey Anderson", "Murugan Ashwin", "Sam Billings", "Carlos Brathwaite", 
@@ -13,8 +11,6 @@ module.exports = {
 	},
     GL: {
         name: "Gujarat Lions",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 3,
         titles: 0,
         players: [ "Suresh Raina", "Akshdeep Nath", "Shubham Agarwal", "Basil Thampi", "Dwayne Bravo", "Chirag Suri", "James Faulkner",
@@ -24,8 +20,6 @@ module.exports = {
     },
 	KXIP: {
         name: "Kings XI Punjab",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 8,
         titles: 0,
         players: [ "Murali Vijay", "Varun Aaron", "Hashim Amla", "Anureet Singh", "Armaan Jaffer", "KC Cariappa", "Martin Guptill",
@@ -35,8 +29,6 @@ module.exports = {
     },
 	KKR: {
         name: "Kolkata Knight Riders",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 4,
         titles: 2,
         players: [ "Gautam Gambhir", "Trent Boult", "Darren Bravo", "Piyush Chawla", "Nathan Coulter-Nile", "Rishi Dhawan", "Sayan Ghosh",
@@ -45,8 +37,6 @@ module.exports = {
     },
 	MI: {
         name: "Mumbai Indians",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 5,
         titles: 2,
         players: [ "Rohit Sharma", "Jasprit Bumrah", "Jos Buttler", "Shreyas Gopal", "Krishnappa Gowtham", "Asela Gunaratne", "Harbhajan Singh",
@@ -56,8 +46,6 @@ module.exports = {
     },
 	RPS: {
         name: "Rising Pune Supergiant",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 7,
         titles: 0,
         players: [ "Steve Smith", "Mayank Agarwal", "Ankit Sharma", "Baba Aparajith", "Ravichandra Ashwin", "Ankush Bains", "Rajat Bhatia",
@@ -67,8 +55,6 @@ module.exports = {
     },
 	RCB: {
         name: "Royal Challengers Bangalore",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 2,
         titles: 0,
         players: [ "Virat Kohli", "Sreenath Aravind", "Avesh Khan", "Samuel Badree", "Stuart Binny", "Yuzvendra Chahal", "Aniket Choudhary",
@@ -77,8 +63,6 @@ module.exports = {
     },
 	SRH: {
         name: "Sunrisers Hyderabad",
-        logo: "",
-        currentPosition: 0,
         positionLastYear: 1,
         titles: 1,
         players: [ "David Warner", "Tanmay Agarwal", "Ricky Bhui", "Bipul Sharma", "Ben Cutting", "Shikhar Dhawan", "Eklavya Dwivedi", "Moises Henriques",

@@ -16,7 +16,7 @@ var _matchTable = "CREATE TABLE IF NOT EXISTS `match` ( `id` INTEGER(3) PRIMARY 
 
 var _potTable = "CREATE TABLE IF NOT EXISTS `pot` ( `id` INTEGER(4) PRIMARY KEY AUTO_INCREMENT, `displayName` VARCHAR(200) NOT NULL, `openTime` DATETIME, `closeTime` DATETIME, `isTeamLevel` TINYINT DEFAULT 0, `multiplierHome` INTEGER(3) DEFAULT 1, `multiplierAway` INTEGER(3) DEFAULT 1, `winner` VARCHAR(100), `match` INTEGER(3) REFERENCES `match`(`id`) ) ENGINE=InnoDB;";
 
-var _betTable = "CREATE TABLE IF NOT EXISTS `bet` ( `id` INTEGER(10) PRIMARY KEY AUTO_INCREMENT, `pot` INTEGER(4) REFERENCES `pot`(`id`), `user` VARCHAR(100) REFERENCES `user`(`id`), `betOn` VARCHAR(100) NOT NULL, `betTime` DATETIME DEFAULT CURRENT_TIMESTAMP, `betAmount` INTEGER NOT NULL, `multiplier` INTEGER(3) DEFAULT 1, `winAmount` INTEGER ) ENGINE=InnoDB;";
+var _betTable = "CREATE TABLE IF NOT EXISTS `bet` ( `id` INTEGER(10) PRIMARY KEY AUTO_INCREMENT, `pot` INTEGER(4) REFERENCES `pot`(`id`), `user` VARCHAR(100) REFERENCES `user`(`id`), `betOn` VARCHAR(100) NOT NULL, `betTeam` VARCHAR(100) NOT NULL, `betTime` DATETIME DEFAULT CURRENT_TIMESTAMP, `betAmount` INTEGER NOT NULL, `multiplier` INTEGER(3) DEFAULT 1, `winAmount` INTEGER ) ENGINE=InnoDB;";
 
 var _transactionTable = "CREATE TABLE IF NOT EXISTS `transaction` ( `id` INTEGER(10) PRIMARY KEY AUTO_INCREMENT, `from` VARCHAR(100), `to` VARCHAR(100), `type` VARCHAR(10), `time` DATETIME DEFAULT CURRENT_TIMESTAMP, `amount` INTEGER, `balanceFrom` INTEGER, `balanceTo` INTEGER ) ENGINE=InnoDB;";
 
