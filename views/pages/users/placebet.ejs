@@ -1,0 +1,207 @@
+<% include ../../partials/users/header.ejs %>
+    <% if(user.betmatch) { %>
+        <%- '<script>var matchID ="' +  user.betmatch + '";</script>' %>
+            <% } %>
+
+                <div class="ui styled fluid accordion" style="width:90%; margin-left:5%; margin-top:20px">
+                    <div class="ui active inverted dimmer">
+                        <div class="ui text loader">Loading</div>
+                    </div>
+                    <div class="title"><i class="dropdown icon"></i> Long Term Bets</div>
+                    <div class="content">
+                        <div class="ui form">
+                            <div id="ltbet">
+                                <table class="ui very basic collapsing striped celled table" style="width:90%; margin-left: 5%;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:25%">Bet Category</th>
+                                            <th style="width:50%">Bet On</th>
+                                            <th style="width:25%">Bet Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Winning Team Bet</td>
+                                            <td>
+                                                <div class="ui selection dropdown" style="width: 100%">
+                                                    <input type="hidden" name="teambet" />
+                                                    <i class="dropdown icon"></i>
+                                                    <div class="default text">Place Bet On</div>
+                                                    <div class="menu">
+                                                        <div class="item" data-value="RCB">Royal Challengers Bangalore</div>
+                                                        <div class="item" data-value="SRH">Sun Risers Hyderabad</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="ui labeled input" style="width:95%">
+                                                    <div class="ui label">₹</div>
+                                                    <input type="number" placeholder="Amount" style="text-align: right" min="1000">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <% if( user.betmatch ) { %>
+                        <div class="title"><i class="dropdown icon"></i> Daily Bets</div>
+                        <div class="content">
+                            <div class="ui form">
+                                <div id="matchbet">
+                                    <table class="ui very basic collapsing striped celled table" style="width:90%; margin-left: 5%;">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:25%">Bet Category</th>
+                                                <th style="width:50%">Bet On</th>
+                                                <th style="width:25%">Bet Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                            <div class="active title"><i class="dropdown icon"></i> Betting History</div>
+                            <div class="content active">
+
+                                <div class="ui feed">
+                                </div>
+                            </div>
+
+                </div>
+                <script>
+                    $('.accordion').accordion();
+                    $.ajax('/apis/bet/user', {
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            var parent = $('.ui.feed')[0];
+
+                            data.forEach(function (item) {
+                                var event = document.createElement('div');
+                                event.setAttribute('class', 'event');
+
+                                var label = document.createElement('div');
+                                label.setAttribute('class', 'label');
+                                var image = document.createElement('img');
+                                image.setAttribute('src', '/images/' + item.betIcon.toLowerCase() + '.png');
+                                label.appendChild(image);
+
+                                var content = document.createElement('div');
+                                content.setAttribute('class', 'content');
+                                var summary = document.createElement('div');
+                                summary.setAttribute('class', 'summary');
+                                summary.innerHTML = 'You bet ' + item.betAmount + ' on <a class="user">' + item.betOn + '</a><div class="date">' + item.betDate + '</div>';
+                                content.appendChild(summary);
+
+                                var meta = document.createElement('div');
+                                meta.setAttribute('class', 'meta');
+                                switch (item.result.substring(0, 3)) {
+                                    case 'Won':
+                                        meta.innerHTML = '<a class="like"><i class="trophy icon"></i> ' + item.result + '</a>';
+                                        break;
+                                    case 'Los':
+                                        meta.innerHTML = '<a class="like"><i class="remove icon"></i> ' + item.result + '</a>';
+                                        break;
+                                    default:
+                                        meta.innerHTML = '<a class="like"><i class="wait icon"></i> ' + item.result + '</a>';
+                                }
+                                content.appendChild(meta);
+                                event.appendChild(label);
+                                event.appendChild(content);
+                                parent.appendChild(event);
+                            });
+                            $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                        }
+                    });
+                    var matchID = typeof matchID !== 'undefined' ? matchID : null;
+                    if (matchID) {
+                        $.ajax('/apis/pot/match/' + matchID, {
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                var parent = $('#matchbet tbody')[0];
+                                console.log(data);
+                                data.forEach(function (bet) {
+                                    var tr = document.createElement('tr');
+                                    tr.setAttribute('id', 'match-' + bet.id);
+
+                                    var td1 = document.createElement('td');
+                                    td1.textContent = bet.displayName.split(':')[0];
+                                    tr.appendChild(td1);
+
+                                    var td2 = document.createElement('td');
+                                    var selection = document.createElement('div');
+                                    selection.setAttribute('class', 'ui selection dropdown');
+                                    selection.setAttribute('style', 'width:100%');
+                                    selection.innerHTML = '<input type="hidden" name="choices" /><i class="dropdown icon"></i><div class="default text">Place Bet On</div>';
+                                    var menu = document.createElement('div');
+                                    menu.setAttribute('class', 'menu');
+                                    bet.options.forEach(function (choice) {
+                                        var opt = document.createElement('div');
+                                        opt.setAttribute('class', 'item');
+                                        opt.setAttribute('data-value', choice.key);
+                                        opt.textContent = choice.value;
+                                        menu.appendChild(opt);
+                                    });
+                                    selection.appendChild(menu);
+                                    td2.appendChild(selection);
+                                    tr.appendChild(td2);
+
+                                    var td3 = document.createElement('td');
+                                    var lInput = document.createElement('div');
+                                    lInput.setAttribute('class', 'ui labeled input');
+                                    var labelDiv = document.createElement('div');
+                                    labelDiv.setAttribute('class', 'ui label');
+                                    labelDiv.textContent = '₹';
+                                    var amountInput = document.createElement('input');
+                                    amountInput.setAttribute('type', 'number');
+                                    amountInput.setAttribute('placeholder', 'Amount');
+                                    amountInput.setAttribute('style', 'text-align:right');
+                                    amountInput.setAttribute('min', 1000);
+                                    lInput.appendChild(labelDiv);
+                                    lInput.appendChild(amountInput);
+                                    td3.appendChild(lInput);
+                                    tr.appendChild(td3);
+
+                                    parent.appendChild(tr);
+                                });
+                                var tr = document.createElement('tr');
+                                var td = document.createElement('td');
+                                td.setAttribute('colspan', '3');
+                                td.setAttribute('style', 'text-align:center');
+                                td.innerHTML = '<button class="ui positive button" id="placeMatchBet">Place Bets</button>';
+                                tr.appendChild(td);
+                                parent.appendChild(tr);
+                                $('#placeMatchBet')[0].addEventListener('click', function (oEvent) {
+                                    var payload = {};
+                                    var rows = $('tr').each((index, element) => {
+                                        if (element.id.startsWith('match')) {
+                                            var potID = parseInt(element.id.split('-')[1], 10);
+                                            var betOn = $('#' + element.id).find('input[type=hidden]')[0].value;
+                                            var betAmount = parseInt($('#' + element.id).find('input[type=number]')[0].value, 10);
+                                            payload[potID] = { betOn: betOn, betAmount: betAmount };
+                                        }
+                                    });
+
+                                    $.ajax('/apis/bet/place/' + matchID, {
+                                        method: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify(payload),
+                                        success: function (data) {
+                                            console.log("success");
+                                        },
+                                        error: function (data) {
+                                            console.log("fucked up");
+                                        }
+                                    })
+                                });
+                                $('.dropdown').dropdown();
+                            }
+                        });
+                    }
+                </script>
+
+                <% include ../../partials/users/footer.ejs %>

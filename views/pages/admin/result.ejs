@@ -1,0 +1,199 @@
+<% include ../../partials/admin/header.ejs %>
+    <div class="ui container segment" style="width:90%; margin-left:5%">
+        <div class="ui segment">
+            <div class="ui active inverted dimmer">
+                <div class="ui text loader">Loading</div>
+            </div>
+            <div class="ui header">Publish Pot Results</div>
+            <div class="ui form" style="display:inline-block; width:100%;">
+                <div class="field">
+                    <label>Match</label>
+                    <select class="ui fluid search dropdown" id="match">
+                        <option value="">Select Match</option>
+                    </select>
+                </div>
+                <div id="tlb">
+                    <table class="ui very basic collapsing striped celled table" style="width:90%; margin-left: 5%;">
+                        <thead>
+                            <tr>
+                                <th style="width:40%">Pot Name</th>
+                                <th style="width:60%">Winner(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $.ajax('/apis/match/undeclared', {
+            success: function (data) {
+                data = JSON.parse(data);
+                var select = $('#match')[0];
+                data.forEach(function (match) {
+                    var option = document.createElement('option');
+                    option.setAttribute('value', match.id);
+                    option.textContent = match.home.name + ' vs ' + match.away.name + ' (' + match.fixture.date + ')';
+                    select.appendChild(option);
+                });
+                select.addEventListener('change', function (oEvent) {
+                    $('.dimmer')[0].setAttribute('class', 'ui active inverted dimmer');
+                    var matchID = oEvent.target.value;
+                    $.ajax('/apis/pot/match/' + matchID, {
+                        async: true,
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            var table = $('#tlb tbody')[0];
+                            $(table).empty();
+                            data.forEach(function (pot) {
+                                console.log(pot);
+                                var tr = document.createElement('tr');
+                                var td1 = document.createElement('td');
+                                td1.textContent = pot.displayName;
+                                tr.appendChild(td1);
+                                var td2 = document.createElement('td');
+                                var select = document.createElement('select');
+                                select.setAttribute('class', 'ui fluid dropdown');
+                                select.setAttribute('multiple', '');
+                                select.setAttribute('name', pot.id);
+                                pot.options.forEach(choice => {
+                                    var option = document.createElement('option');
+                                    option.value = choice.key;
+                                    option.textContent = choice.value;
+                                    select.appendChild(option);
+                                });
+                                td2.appendChild(select);
+                                tr.appendChild(td2);
+                                table.appendChild(tr);
+                            });
+                            $('.dropdown').dropdown();
+                            var tr = document.createElement('tr');
+                            var td = document.createElement('td');
+                            td.setAttribute('colspan', '2');
+                            td.setAttribute('style', 'text-align:center');
+                            var btn = document.createElement('button');
+                            btn.setAttribute('class', 'ui positive button');
+                            btn.textContent = 'Update Pots';
+                            btn.addEventListener('click', function (oEvent) {
+                                var payload = {};
+                                $('#tlb select').each((index, element)=>{
+                                    payload[element.getAttribute('name')] = $(element).val() ? $(element).val() : [];
+                                });
+                                $.ajax('/apis/pot/update-winner', {
+                                    method: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(payload),
+                                    success: function (data) {
+                                        $('.modal .header')[0].textContent = 'Success';
+                                        $('.modal .content p')[0].textContent = data;
+                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                    },
+                                    error: function (error) {
+                                        $('.modal .header')[0].textContent = error.statusText;
+                                        $('.modal .content p')[0].textContent = error.responseText;
+                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                    }
+                                });
+                            });
+                            td.appendChild(btn);
+                            tr.appendChild(td);
+                            table.appendChild(tr);
+                            $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                        },
+                        error: function (data) {
+                            $('.modal .header')[0].textContent = error.statusText;
+                            $('.modal .content p')[0].textContent = error.responseText;
+                            $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                        }
+                    });
+                    $.ajax('/apis/pot/static/' + matchID, {
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            data.active.map(function (item, index) {
+                                data.active[index] = {
+                                    active: true,
+                                    value: item
+                                };
+                            });
+                            data.inactive.map(function (item, index) {
+                                data.inactive[index] = {
+                                    active: false,
+                                    value: item
+                                };
+                            });
+                            data = data.active.concat(data.inactive);
+
+                            var form = $('.form')[0];
+                            var i;
+                            var threeFields = document.createElement('div');
+                            threeFields.setAttribute('class', 'three fields');
+                            for (i = 0; i < 3; i++) {
+                                threeFields.appendChild(staticEntry(data[i].value, data[i].active));
+                            }
+                            form.appendChild(threeFields);
+                            var threeFields = document.createElement('div');
+                            threeFields.setAttribute('class', 'three fields');
+                            for (i = 3; i < 6; i++) {
+                                threeFields.appendChild(staticEntry(data[i].value, data[i].active));
+                            }
+                            form.appendChild(threeFields);
+                            var threeFields = document.createElement('div');
+                            threeFields.setAttribute('class', 'three fields');
+                            for (i = 6; i < 9; i++) {
+                                threeFields.appendChild(staticEntry(data[i].value, data[i].active));
+                            }
+                            form.appendChild(threeFields);
+                            var btn = document.createElement('button');
+                            btn.setAttribute('class', 'ui positive button');
+                            btn.textContent = 'Update Pots';
+                            btn.addEventListener('click', function (oEvent) {
+                                var payload = {
+                                    match: matchID,
+                                    openTime: window.ot,
+                                    closeTime: window.ct,
+                                    home: $('input[type=number]')[0].value,
+                                    away: $('input[type=number]')[1].value,
+                                    static: []
+                                };
+                                var static = [];
+                                $('input[type=checkbox]').each(function (index, item) {
+                                    if (item.checked) {
+                                        static.push(item.id);
+                                    }
+                                });
+                                payload.static = static;
+                                $.ajax('/apis/pot/add/short-term', {
+                                    method: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(payload),
+                                    success: function (data) {
+                                        $('.modal .header')[0].textContent = 'Success';
+                                        $('.modal .content p')[0].textContent = data;
+                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                    },
+                                    error: function (error) {
+                                        $('.modal .header')[0].textContent = error.statusText;
+                                        $('.modal .content p')[0].textContent = error.responseText;
+                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                    }
+                                });
+                            });
+                            form.appendChild(btn);
+                            $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                        }
+                    });
+                });
+                $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+            },
+            error: function (error) {
+                $('.modal .header')[0].textContent = error.statusText;
+                $('.modal .content p')[0].textContent = error.responseText;
+                $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+            }
+        })
+    </script>
+
+    <% include ../../partials/admin/footer.ejs %>
