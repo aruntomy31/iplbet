@@ -59,7 +59,7 @@ router.get('/user', util.checkUser, function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT p.`displayName` AS potName, b.`betOn` AS betOn, b.`betTeam` AS betIcon, b.`betAmount` AS betAmount, b.`betTime` AS betDate, (CASE WHEN b.`winner` IS NULL THEN 'Not Declared' WHEN b.`winner` = 1 THEN CONCAT('Won ', b.`winAmount`) ELSE CONCAT('Lost ', b.`betAmount`) END) AS result FROM `bet` b, `match` m, `pot` p WHERE p.`match` = m.`id` AND b.`pot` = p.`id` AND b.`user`=? ORDER BY m.`fixture`, p.`displayName`, b.`betTime`;", request.user.id, callback);
+                connection.query("(SELECT p.`displayName` AS potName, b.`betOn` AS betOn, b.`betTeam` AS betIcon, b.`betAmount` AS betAmount, b.`betTime` AS betDate, (CASE WHEN b.`winner` IS NULL THEN 'Not Declared' WHEN b.`winner` = 1 THEN CONCAT('Won ', b.`winAmount`) ELSE CONCAT('Lost ', b.`betAmount`) END) AS result FROM `bet` b, `pot` p WHERE b.`pot` = p.`id` AND b.`user`= ? AND p.`match` IS NULL ORDER BY p.`displayName`, b.`betTime`) UNION (SELECT p.`displayName` AS potName, b.`betOn` AS betOn, b.`betTeam` AS betIcon, b.`betAmount` AS betAmount, b.`betTime` AS betDate, (CASE WHEN b.`winner` IS NULL THEN 'Not Declared' WHEN b.`winner` = 1 THEN CONCAT('Won ', b.`winAmount`) ELSE CONCAT('Lost ', b.`betAmount`) END) AS result FROM `bet` b, `match` m, `pot` p WHERE p.`match` = m.`id` AND b.`pot` = p.`id` AND b.`user`= ? ORDER BY m.`fixture`, p.`displayName`, b.`betTime`)", [ request.user.id, request.user.id ], callback);
             }
         ], connection, function(error, bets) {
             if(error) return response.status(500).send("Unable to fetch bets.");
@@ -91,6 +91,22 @@ router.post('/place/:matchId', util.checkActiveUser, function (request, response
         
         if(pots.length === 0) {
             message = "No bets to be placed.";
+            throw message;
+        }
+        
+        var userBalance = util.checkInteger(request.user.balance);
+        var totalBetAmount = 0;
+        
+        for(var potId in data) {
+            if(data[potId].betAmount < 1000) {
+                message = "A minimum bet of 1000 is mandatory for each bet.";
+                throw message;
+            }
+            totalBetAmount += data[potId].betAmount;
+        }
+        
+        if(userBalance < totalBetAmount) {
+            message = "Not enough balance to place all bets.";
             throw message;
         }
         
@@ -141,8 +157,6 @@ router.post('/place/:matchId', util.checkActiveUser, function (request, response
                         betTeam = pot.awayShort;
                         multiplier = pot.isTeamLevel ? pot.multiplierAway : 1;
                     }
-
-                    if(data[pot.id].betAmount > balance) return callback("Not enough balance to place all bets.");
 
                     values.push([ pot.id, request.user.id, data[pot.id].betOn, betTeam, data[pot.id].betAmount, multiplier ]);
                     balance -= data[pot.id].betAmount;
@@ -210,6 +224,22 @@ router.post('/place', util.checkActiveUser, function (request, response) {
             throw message;
         }
         
+        var userBalance = util.checkInteger(request.user.balance);
+        var totalBetAmount = 0;
+        
+        for(var potId in data) {
+            if(data[potId].betAmount < 1000) {
+                message = "A minimum bet of 1000 is mandatory for each bet.";
+                throw message;
+            }
+            totalBetAmount += data[potId].betAmount;
+        }
+        
+        if(userBalance < totalBetAmount) {
+            message = "Not enough balance to place all bets.";
+            throw message;
+        }
+        
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
@@ -252,8 +282,6 @@ router.post('/place', util.checkActiveUser, function (request, response) {
 
                         var betTeam = pot.isTeamLevel ? teams[data[pot.id].betOn] : players[data[pot.id].betOn];
                         var multiplier = pot.multiplierHome;
-
-                        if(data[pot.id].betAmount > balance) return callback("Not enough balance to place all bets.");
 
                         values.push([ pot.id, request.user.id, data[pot.id].betOn, betTeam, data[pot.id].betAmount, multiplier ]);
                         balance -= data[pot.id].betAmount;

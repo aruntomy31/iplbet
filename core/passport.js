@@ -72,7 +72,7 @@ module.exports = function(app, passport) {
             var connection = mysql.getConnection();
             mysql.transaction([
                 function(callback) {
-                    connection.query("SELECT * FROM `user` WHERE `id` = ?", user, callback);
+                    connection.query("SELECT u.*, c.`value` AS transfer FROM `user` u, `configuration` c WHERE u.`id` = ? AND c.`key` = 'transfers'", user, callback);
                 }
             ], connection, function(error, users) {
                 if(error) return done(error);

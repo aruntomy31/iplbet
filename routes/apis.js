@@ -63,7 +63,7 @@ router.post('/admin/enable-transfer', util.checkAdmin, function(request, respons
     }
 });
 
-router.get('/transfer-allowed', function(request, response) {
+router.get('/transfer-allowed', util.checkActiveUser, function(request, response) {
     try {
         var connection = mysql.getConnection();
         mysql.transaction([

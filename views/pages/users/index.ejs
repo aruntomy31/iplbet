@@ -3,12 +3,17 @@
         .statistic {
             width: 100%;
         }
+        
+        .ui.statistic>.value,
+        .ui.statistics .statistic>.value {
+            font-size: 2.75rem !important;
+        }
     </style>
     <div class="ui cards segment" style="width:90%; margin-left:5%; margin-top:20px;">
         <div class="ui centered card">
             <div class="content">
                 <div class="ui blue statistic">
-                    <div class="value">₹
+                    <div class="value">₹<br>
                         <%= user.moneyInHand.toLocaleString('en-IN') %>
                     </div>
                     <div class="label">Cash In Hand</div>
@@ -18,7 +23,7 @@
         <div class="ui centered card">
             <div class="content">
                 <div class="ui yellow statistic">
-                    <div class="value">₹
+                    <div class="value">₹<br>
                         <%= user.moneyInBet.toLocaleString('en-IN') %>
                     </div>
                     <div class="label">Money in Bets</div>
@@ -28,7 +33,7 @@
         <div class="ui centered card">
             <div class="content">
                 <div class="ui green statistic">
-                    <div class="value">₹
+                    <div class="value">₹<br>
                         <%= user.moneyWon.toLocaleString('en-IN') %>
                     </div>
                     <div class="label">Money Won</div>
@@ -38,7 +43,7 @@
         <div class="ui centered card">
             <div class="content">
                 <div class="ui red statistic">
-                    <div class="value">₹
+                    <div class="value">₹<br>
                         <%= user.moneyLost.toLocaleString('en-IN') %>
                     </div>
                     <div class="label">Money Lost</div>
@@ -110,7 +115,7 @@
                 $('.modal .content p')[0].textContent = error.responseText;
                 $('.chart')[0].innerHTML = 'Unable to load chart';
                 $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
-                $('#chartBusy')[0].setAttribute('class', 'ui inverted dimmer');                
+                $('#chartBusy')[0].setAttribute('class', 'ui inverted dimmer');
             }
         });
     </script>
@@ -132,7 +137,7 @@
                     tr.setAttribute('id', match.id);
                     tr.setAttribute('style', 'cursor:pointer');
                     tr.addEventListener('click', function (oEvent) {
-                        window.location = window.location.protocol + '//' + window.location.host + cleanPath(window.location.pathname) + '/betzone/' + oEvent.currentTarget.id;
+                        window.location = 'http://iplbet.herokuapp.com/users/betzone/' + oEvent.currentTarget.id;
                     });
 
                     var tdHome = document.createElement('td');

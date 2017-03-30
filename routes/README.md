@@ -17,7 +17,7 @@
 ### Is Transfer Allowed
 - **HTTP Method**: GET
 - **Endpoint**: ``` /apis/transfer-allowed ```
-- **Authorization**: None
+- **Authorization**: Active User
 - **Return Value**:
   > **success**: true
 
@@ -191,9 +191,26 @@
 - **Endpoint**: ``` /apis/pot/add/short-term ```
 - **Authorization**: Admin
 - **Parameters**:
-  > { match, openTime, closeTime, home, away, static: [] }
+  > { match, openTime, closeTime, pots: { potId: { home, away }, ... }, static: [] }
 - **Return Value**:
   > **success**: New [ &lt;potCount&gt; ] Pot/s added successfully
+### Update pot winner
+- **HTTP Method**: POST
+- **Endpoint**: ``` /apis/pot/update-winner ```
+- **Authorization**: Admin
+- **Parameters**:
+  > { potId: [ result, ... ], ... }
+- **Return Value**:
+  > **success**: Pot results updated successfully.
+### Update long-term pot
+- **HTTP Method**: POST
+- **Endpoint**: ``` /apis/pot/update/long-term ```
+- **Authorization**: Admin
+- **Parameters**:
+  > { potId: { openTime, closeTime, multiplier }, ... }
+- **Return Value**:
+  > **success**: Long-Term Pots updated successfully
+
 
 ## Bet APIs
 
@@ -217,7 +234,16 @@
 - **Authorization**: User
 - **Return Value**:
   > **success**: [ { potName, betOn, betIcon, betAmount, betDate, result }, ... ]
-### Place a new bet
+### Place a new bets on pots (for a match)
+- **HTTP Method**: POST
+- **Endpoint**: ``` /apis/bet/place/:matchId ```
+- **Authorization**: Active User
+- **Parameters**:
+  > **:matchId** - *id of the match*
+  > { potId: { betOn, betAmount }, ... }
+- **Return Value**:
+  > **success**: New [ &lt;betCount&gt; ] Bet/s placed successfully
+### Place a new bets on long-term pots
 - **HTTP Method**: POST
 - **Endpoint**: ``` /apis/bet/place ```
 - **Authorization**: Active User

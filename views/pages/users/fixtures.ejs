@@ -1,13 +1,12 @@
-<% include ../../partials/admin/header.ejs %>
-    <div class="ui container segment" style="width:90%; margin-left:5%;">
+<% include ../../partials/users/header.ejs %>
+    <div class="ui link segment" style="width:60%; margin-left:20%;">
+        <div class="ui header">Fixtures &amp; Results</div>
         <table class="ui very basic collapsing striped celled table" style="width:80%; margin-left:10%;">
             <thead>
                 <tr>
-                    <th style="text-align:center">Amount</th>
                     <th style="text-align: right">Home Team</th>
-                    <th style="text-align: center">Pot</th>
+                    <th style="text-align: center">Date/Result</th>
                     <th>Away Team</th>
-                    <th style="text-align:center">Amount</th>
                 </tr>
             </thead>
             <tbody>
@@ -15,17 +14,17 @@
         </table>
     </div>
     <script>
-        $.ajax('/apis/pot/open/teams', {
+        $.ajax('/apis/match/all', {
             success: function(data) {
                 data = JSON.parse(data);
                 var parent = document.querySelector('.ui.very.basic.collapsing.striped.celled.table tbody');
-                for(var datum in data) {
-                    var match = data[datum];
+                data.forEach(function(match) {
                     var tr = document.createElement('tr');
-
-                    var tdHomeAmount = document.createElement('td');
-                    tdHomeAmount.setAttribute('style', 'text-align:center !important');
-                    tdHomeAmount.textContent = typeof match.teams[match.homeShort] !== 'undefined' ? match.teams[match.homeShort].toLocaleString('en-IN') : '0';
+                    tr.setAttribute('id', match.id);
+                    tr.setAttribute('style', 'cursor:pointer');
+                    tr.addEventListener('click', function (oEvent) {
+                        window.location = 'http://iplbet.herokuapp.com/users/betzone/' + oEvent.currentTarget.id;
+                    });
 
                     var tdHome = document.createElement('td');
                     tdHome.setAttribute('style', 'text-align:right !important');
@@ -33,13 +32,13 @@
                     h4Home.setAttribute('class', 'ui image header');
                     var divHomeContent = document.createElement('div');
                     divHomeContent.setAttribute('class', 'content');
-                    divHomeContent.appendChild(document.createTextNode(match.homeShort));
+                    divHomeContent.appendChild(document.createTextNode(match.home.shortName));
                     var divHomeSubHeader = document.createElement('div');
                     divHomeSubHeader.setAttribute('class', 'sub header');
-                    divHomeSubHeader.textContent = match.home;
+                    divHomeSubHeader.textContent = match.home.name;
                     divHomeContent.appendChild(divHomeSubHeader);
                     var imgHome = document.createElement('img');
-                    imgHome.setAttribute('src', '/images/' + match.homeShort.toLowerCase() + '.png');
+                    imgHome.setAttribute('src', '/images/' + match.home.shortName.toLowerCase() + '.png');
                     imgHome.setAttribute('class', 'ui mini rounded image');
                     imgHome.setAttribute('style', 'padding-left: 5px');
                     h4Home.appendChild(divHomeContent);
@@ -50,7 +49,19 @@
                     var h4Middle = document.createElement('h4');
                     h4Middle.setAttribute('class', 'ui header');
                     h4Middle.setAttribute('style', 'text-align: center !important');
-                    h4Middle.textContent = match.potName.split(':')[0];
+                    var divMiddleContent = document.createElement('div');
+                    divMiddleContent.setAttribute('class', 'content');
+                    var divMiddleSubHeader = document.createElement('div');
+                    divMiddleSubHeader.setAttribute('class', 'sub header');
+                    if (match.result) {
+                        divMiddleContent.appendChild(document.createTextNode(match.result.won + ' won'));
+                        divMiddleSubHeader.textContent = 'by ' + match.result.by;
+                    } else {
+                        divMiddleContent.appendChild(document.createTextNode(match.fixture.date));
+                        divMiddleSubHeader.textContent = match.fixture.time;
+                    }
+                    divMiddleContent.appendChild(divMiddleSubHeader);
+                    h4Middle.appendChild(divMiddleContent);
                     tdMiddle.appendChild(h4Middle);
 
                     var tdAway = document.createElement('td');
@@ -58,32 +69,26 @@
                     h4Away.setAttribute('class', 'ui image header');
                     var divAwayContent = document.createElement('div');
                     divAwayContent.setAttribute('class', 'content');
-                    divAwayContent.appendChild(document.createTextNode(match.awayShort));
+                    divAwayContent.appendChild(document.createTextNode(match.away.shortName));
                     var divAwaySubHeader = document.createElement('div');
                     divAwaySubHeader.setAttribute('class', 'sub header');
-                    divAwaySubHeader.textContent = match.away;
+                    divAwaySubHeader.textContent = match.away.name;
                     divAwayContent.appendChild(divAwaySubHeader);
                     var imgAway = document.createElement('img');
-                    imgAway.setAttribute('src', '/images/' + match.awayShort.toLowerCase() + '.png');
+                    imgAway.setAttribute('src', '/images/' + match.away.shortName.toLowerCase() + '.png');
                     imgAway.setAttribute('class', 'ui mini rounded image');
                     h4Away.appendChild(imgAway);
                     h4Away.appendChild(divAwayContent);
                     tdAway.appendChild(h4Away);
 
-                    var tdAwayAmount = document.createElement('td');
-                    tdAwayAmount.setAttribute('style', 'text-align:center !important');
-                    tdAwayAmount.textContent = typeof match.teams[match.awayShort] !== 'undefined' ? match.teams[match.awayShort].toLocaleString('en-IN') : '0';
-
-                    tr.appendChild(tdHomeAmount);
                     tr.appendChild(tdHome);
                     tr.appendChild(tdMiddle);
                     tr.appendChild(tdAway);
-                    tr.appendChild(tdAwayAmount);
 
                     parent.appendChild(tr);
-                }
+                });
             }
         });
 
     </script>
-    <% include ../../partials/admin/footer.ejs %>
+    <% include ../../partials/users/footer.ejs %>

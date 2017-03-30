@@ -20,26 +20,26 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Winning Team Bet</td>
-                                            <td>
-                                                <div class="ui selection dropdown" style="width: 100%">
-                                                    <input type="hidden" name="teambet" />
-                                                    <i class="dropdown icon"></i>
-                                                    <div class="default text">Place Bet On</div>
-                                                    <div class="menu">
-                                                        <div class="item" data-value="RCB">Royal Challengers Bangalore</div>
-                                                        <div class="item" data-value="SRH">Sun Risers Hyderabad</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="ui labeled input" style="width:95%">
-                                                    <div class="ui label">₹</div>
-                                                    <input type="number" placeholder="Amount" style="text-align: right" min="1000">
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <!--<tr>
+    <td>Winning Team Bet</td>
+    <td>
+        <div class="ui selection dropdown" style="width: 100%">
+            <input type="hidden" name="teambet" />
+            <i class="dropdown icon"></i>
+            <div class="default text">Place Bet On</div>
+            <div class="menu">
+                <div class="item" data-value="RCB">Royal Challengers Bangalore</div>
+                <div class="item" data-value="SRH">Sun Risers Hyderabad</div>
+            </div>
+        </div>
+    </td>
+    <td>
+        <div class="ui labeled input" style="width:95%">
+            <div class="ui label">₹</div>
+            <input type="number" placeholder="Amount" style="text-align: right" min="1000">
+        </div>
+    </td>
+</tr>-->
                                     </tbody>
                                 </table>
                             </div>
@@ -75,6 +75,96 @@
                 </div>
                 <script>
                     $('.accordion').accordion();
+                    $.ajax('/apis/pot/long-term', {
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            var parent = $('#ltbet tbody')[0];
+                            data.forEach(function (bet) {
+                                var tr = document.createElement('tr');
+                                tr.setAttribute('id', 'lt-' + bet.id);
+
+                                var td1 = document.createElement('td');
+                                td1.textContent = bet.displayName.split(':')[0];
+                                tr.appendChild(td1);
+
+                                var td2 = document.createElement('td');
+                                var selection = document.createElement('div');
+                                selection.setAttribute('class', 'ui selection search dropdown');
+                                selection.setAttribute('style', 'width:100%');
+                                selection.innerHTML = '<input type="hidden" name="choices" /><i class="dropdown icon"></i><div class="default text">Place Bet On</div>';
+                                var menu = document.createElement('div');
+                                menu.setAttribute('class', 'menu');
+                                bet.options.forEach(function (choice) {
+                                    var opt = document.createElement('div');
+                                    opt.setAttribute('class', 'item');
+                                    opt.setAttribute('data-value', choice.key);
+                                    opt.textContent = choice.value;
+                                    menu.appendChild(opt);
+                                });
+                                selection.appendChild(menu);
+                                td2.appendChild(selection);
+                                tr.appendChild(td2);
+
+                                var td3 = document.createElement('td');
+                                var lInput = document.createElement('div');
+                                lInput.setAttribute('class', 'ui labeled input');
+                                var labelDiv = document.createElement('div');
+                                labelDiv.setAttribute('class', 'ui label');
+                                labelDiv.textContent = '₹';
+                                var amountInput = document.createElement('input');
+                                amountInput.setAttribute('type', 'number');
+                                amountInput.setAttribute('placeholder', 'Amount');
+                                amountInput.setAttribute('style', 'text-align:right');
+                                amountInput.setAttribute('min', 1000);
+                                lInput.appendChild(labelDiv);
+                                lInput.appendChild(amountInput);
+                                td3.appendChild(lInput);
+                                tr.appendChild(td3);
+
+                                parent.appendChild(tr);
+                            });
+                            var tr = document.createElement('tr');
+                            var td = document.createElement('td');
+                            td.setAttribute('colspan', '3');
+                            td.setAttribute('style', 'text-align:center');
+                            td.innerHTML = '<button class="ui positive button" id="placeLTBet">Place Bets</button>';
+                            tr.appendChild(td);
+                            parent.appendChild(tr);
+                            $('#placeLTBet')[0].addEventListener('click', function (oEvent) {
+                                $('.dimmer')[0].setAttribute('class', 'ui active inverted dimmer');
+                                var payload = {};
+                                var rows = $('tr').each((index, element) => {
+                                    if (element.id.startsWith('lt')) {
+                                        var potID = parseInt(element.id.split('-')[1], 10);
+                                        var betOn = $('#' + element.id).find('input[type=hidden]')[0].value;
+                                        var betAmount = parseInt($('#' + element.id).find('input[type=number]')[0].value, 10);
+                                        if (betAmount >= 1000 && betOn !== '') {
+                                            payload[potID] = { betOn: betOn, betAmount: betAmount };
+                                        }
+                                    }
+                                });
+
+                                $.ajax('/apis/bet/place', {
+                                    method: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(payload),
+                                    success: function (data) {
+                                        $('.modal .header')[0].textContent = 'Success';
+                                        $('.modal .content p')[0].textContent = data;
+                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                        $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                                    },
+                                    error: function (error) {
+                                        $('.modal .header')[0].textContent = error.statusText;
+                                        $('.modal .content p')[0].textContent = error.responseText;
+                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                        $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                                    }
+                                })
+                            });
+                            $('.dropdown').dropdown();
+                        }
+                    });
                     $.ajax('/apis/bet/user', {
                         success: function (data) {
                             data = JSON.parse(data);
@@ -123,7 +213,6 @@
                             success: function (data) {
                                 data = JSON.parse(data);
                                 var parent = $('#matchbet tbody')[0];
-                                console.log(data);
                                 data.forEach(function (bet) {
                                     var tr = document.createElement('tr');
                                     tr.setAttribute('id', 'match-' + bet.id);
@@ -134,7 +223,7 @@
 
                                     var td2 = document.createElement('td');
                                     var selection = document.createElement('div');
-                                    selection.setAttribute('class', 'ui selection dropdown');
+                                    selection.setAttribute('class', 'ui selection search dropdown');
                                     selection.setAttribute('style', 'width:100%');
                                     selection.innerHTML = '<input type="hidden" name="choices" /><i class="dropdown icon"></i><div class="default text">Place Bet On</div>';
                                     var menu = document.createElement('div');
@@ -176,13 +265,16 @@
                                 tr.appendChild(td);
                                 parent.appendChild(tr);
                                 $('#placeMatchBet')[0].addEventListener('click', function (oEvent) {
+                                    $('.dimmer')[0].setAttribute('class', 'ui active inverted dimmer');
                                     var payload = {};
                                     var rows = $('tr').each((index, element) => {
                                         if (element.id.startsWith('match')) {
                                             var potID = parseInt(element.id.split('-')[1], 10);
                                             var betOn = $('#' + element.id).find('input[type=hidden]')[0].value;
                                             var betAmount = parseInt($('#' + element.id).find('input[type=number]')[0].value, 10);
-                                            payload[potID] = { betOn: betOn, betAmount: betAmount };
+                                            if (betAmount >= 1000 && betOn !== '') {
+                                                payload[potID] = { betOn: betOn, betAmount: betAmount };
+                                            }
                                         }
                                     });
 
@@ -191,10 +283,16 @@
                                         contentType: 'application/json',
                                         data: JSON.stringify(payload),
                                         success: function (data) {
-                                            console.log("success");
+                                            $('.modal .header')[0].textContent = 'Success';
+                                            $('.modal .content p')[0].textContent = data;
+                                            $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                            $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
                                         },
-                                        error: function (data) {
-                                            console.log("fucked up");
+                                        error: function (error) {
+                                            $('.modal .header')[0].textContent = error.statusText;
+                                            $('.modal .content p')[0].textContent = error.responseText;
+                                            $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                            $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
                                         }
                                     })
                                 });

@@ -64,4 +64,34 @@ router.get('/results', function (request, response) {
 	}
 });
 
+router.get('/stats', function (request, response) {
+	try {
+		response.render('pages/admin/stats', {
+			title: 'BettingBad : Betting Statistics',
+			active: 'stats',
+			user: {
+				name: request.user.name
+			}
+		});
+	} catch(error) {
+        console.log("Error Stack Trace: " + error.stack);
+		response.redirect('/error');
+	}
+});
+
+router.get('/transfers', function (request, response) {
+	try {
+		response.render('pages/admin/transfer', {
+			title: 'BettingBad : Transfer Configuration',
+			active: 'transfers',
+			user: {
+				name: request.user.name
+			}
+		});
+	} catch(error) {
+        console.log("Error Stack Trace: " + error.stack);
+		response.redirect('/error');
+	}
+});
+
 module.exports = router;

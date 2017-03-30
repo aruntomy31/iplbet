@@ -68,18 +68,18 @@ router.get('/long-term', function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT * FROM `pot` WHERE `match` IS NULL", matchId, callback);
+                connection.query("SELECT * FROM `pot` WHERE `match` IS NULL", callback);
             },
             function(pots) {
                 var callback = arguments[arguments.length-1];
-                connection.query("SELECT m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND m.`id` = ?", matchId, function(error, teams) {
+                connection.query("SELECT t.`name` FROM `team` t", function(error, teams) {
                     if(error) return callback(error);
-                    else return callback(null, pots, teams[0]);
+                    return callback(null, pots, teams);
                 });
             },
             function(pots, teams) {
                 var callback = arguments[arguments.length-1];
-                connection.query("SELECT p.* FROM `player` p, `match` m WHERE (p.`team` = m.`homeTeam` OR p.`team` = m.`awayTeam`) AND m.`id` = ?", matchId, function(error, players) {
+                connection.query("SELECT p.`name` FROM `player` p", function(error, players) {
                     if(error) return callback(error);
                     else return callback(null, pots, teams, players);
                 });
@@ -89,8 +89,12 @@ router.get('/long-term', function (request, response) {
                 pots.forEach(pot => {
                     pot.options = [];
                     if(pot.isTeamLevel) {
-                        pot.options.push({ key: teams.htn, value: teams.htn });
-                        pot.options.push({ key: teams.atn, value: teams.atn });
+                        teams.forEach(team => {
+                            pot.options.push({
+                                key: team.name,
+                                value: team.name
+                            });
+                        });
                     } else {
                         players.forEach(player => {
                             pot.options.push({
@@ -238,7 +242,7 @@ router.get('/open/teams', util.checkAdmin, function(request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT p.`id` AS pot, m.`id` AS match, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CURRENT_TIMESTAMP AND p.`closeTime` >= CURRENT_TIMESTAMP", callback);
+                connection.query("SELECT p.`id` AS pot, m.`id` AS `match`, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CURRENT_TIMESTAMP AND p.`closeTime` >= CURRENT_TIMESTAMP", callback);
             },
             function(pots) {
                 var callback = arguments[arguments.length-1];
@@ -254,11 +258,14 @@ router.get('/open/teams', util.checkAdmin, function(request, response) {
             },
             function(result, betGroups) {
                 var callback = arguments[arguments.length-1];
-                betsGroup.forEach(betGroup => {
-                    var potResult = finalResult[betGroup.pot].teams;
-                    potResult[betGroup.team] = betGroup.amount;
+                var output = {};
+                betGroups.forEach(betGroup => {
+                    output[betGroup.pot] = result[betGroup.pot];
+                    output[betGroup.pot].teams = typeof output[betGroup.pot].teams !== 'undefined' ? output[betGroup.pot].teams : {};
+                    output[betGroup.pot].teams[betGroup.team] = betGroup.amount;
                 });
-                callback(null, result);
+                console.log(output);
+                callback(null, output);
             }
         ], connection, function(error, pots) {
             if(error) return response.status(500).send("Unable to fetch pots.");
@@ -325,27 +332,42 @@ router.post('/add/short-term', util.checkAdmin, function (request, response) {
         
         message = "Please enter a valid openTime";
         data.openTime = util.getSQLDate(new Date(data.openTime));
-        
+
         message = "Please enter a valid closeTime";
         data.closeTime = util.getSQLDate(new Date(data.closeTime));
         
-        message = "Please enter a valid multiplier for home team";
-        data.home = util.checkInteger(data.home, message);
-        
-        message = "Please enter a valid multiplier for away team";
-        data.away = util.checkInteger(data.away, message);
-        
-        if(data.home < 1 || data.away < 1) {
-            message = "Multiplier value cannot be less than 1.";
+        if(!data.pots) {
+            message = "Please specify pots to be updated";
             throw message;
         }
         
+        var tasks = [];
+        var pots = Object.keys(data.pots);
+        
+        for(var potId in data.pots) {
+            message = "Please enter a valid multiplier for home team";
+            data.pots[potId].home = util.checkInteger(data.pots[potId].home, message);
+
+            message = "Please enter a valid multiplier for away team";
+            data.pots[potId].away = util.checkInteger(data.pots[potId].away, message);
+
+            if(data.pots[potId].home < 1 || data.pots[potId].away < 1) {
+                message = "Multiplier value cannot be less than 1.";
+                throw message;
+            }
+        }
+        
         var connection = mysql.getConnection();
-        mysql.transaction([
-            function(callback) {
-                // Update Team Level Bet For Multipliers
-                connection.query("UPDATE `pot` SET `multiplierHome` = ?, `multiplierAway` = ? WHERE `match` = ?", [data.home, data.away, data.match], callback);
-            },
+        pots.forEach(potId => {
+            tasks.push(
+                function() {
+                    var callback = arguments[arguments.length-1];
+                    connection.query("UPDATE `pot` SET `multiplierHome` = ?, `multiplierAway` = ? WHERE `match` = ? AND `id` = ?", [ data.pots[potId].home, data.pots[potId].away, data.match, potId ], callback);
+                }
+            );
+        });
+        
+        tasks.push(
             function() {
                 // Update Multipliers of all users' bets
                 var callback = arguments[arguments.length-1];
@@ -365,7 +387,10 @@ router.post('/add/short-term', util.checkAdmin, function (request, response) {
                     });
                 } else return callback(null, data.static.length);
             }
-        ], connection, function(error, potCount) {
+        );
+        
+        var connection = mysql.getConnection();
+        mysql.transaction(tasks, connection, function(error, potCount) {
             if(error) return response.status(500).send("Error while adding new pot: " + error);
             return response.status(200).send("New " + potCount + " Pot/s added successfully");
         });
@@ -375,7 +400,7 @@ router.post('/add/short-term', util.checkAdmin, function (request, response) {
             console.log("Error Stack Trace: " + exception.stack);
             exception = "Unknown Error Occurred. Contact Technical Administrator.";
         }
-        return status(500).send(exception);
+        return response.status(500).send(exception);
     }
 });
 
@@ -416,6 +441,59 @@ router.post('/update-winner', util.checkAdmin, function(request, response) {
         mysql.transaction(tasks, connection, function(error) {
             if(error) return response.status(500).send("Error while updating pot winner: " + error);
             return response.status(200).send("Pot results updated successfully.");
+        });
+    } catch(exception) {
+        if(exception !== message) {
+            console.log("Error occurred while adding new pot: " + exception);
+            console.log("Error Stack Trace: " + exception.stack);
+            exception = "Unknown Error Occurred. Contact Technical Administrator.";
+        }
+        return status(500).send(exception);
+    }
+});
+
+// 11. Update long-term pot [/apis/pot/update/long-term]
+router.post('/update/long-term', util.checkAdmin, function (request, response) {
+    var message = null;
+    try {
+        var data = request.body ? request.body : undefined;
+        if (!data) {
+            message = "Please provide appropriate data";
+            throw message;
+        }
+        
+        var tasks = [];
+        var pots = Object.keys(data);
+        
+        var connection = mysql.getConnection();
+        pots.forEach(potId => {
+            
+            message = "Please enter a valid openTime";
+            var openTime = util.getSQLDate(new Date(data[potId].openTime));
+
+            message = "Please enter a valid closeTime";
+            var closeTime = util.getSQLDate(new Date(data[potId].closeTime));
+
+            message = "Please enter a valid multiplier for the pot";
+            var multiplier = util.checkInteger(data[potId].multiplier, message);
+
+            if(multiplier < 1) {
+                message = "Multiplier value cannot be less than 1.";
+                throw message;
+            }
+            
+            tasks.push(
+                function() {
+                    var callback = arguments[arguments.length-1];
+                    connection.query("UPDATE `pot` SET `openTime` = ?, `closeTime` = ?, `multiplierHome` = ? WHERE `id` = ? AND `match` IS NULL", [ openTime, closeTime, multiplier, potId ], callback);
+                }
+            );
+        });
+        
+        var connection = mysql.getConnection();
+        mysql.transaction(tasks, connection, function(error) {
+            if(error) return response.status(500).send("Error while adding new pot: " + error);
+            return response.status(200).send("Long-Term Pots updated successfully");
         });
     } catch(exception) {
         if(exception !== message) {

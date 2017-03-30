@@ -5,7 +5,7 @@ var mysql = require('./mysql');
 
 var _tables = {
     user:
-        "CREATE TABLE IF NOT EXISTS `user` ( `id` VARCHAR(100) PRIMARY KEY, `name` VARCHAR(200), `email` VARCHAR(100), `photoURL` VARCHAR(1000), `admin` TINYINT DEFAULT 0, `suspended` TINYINT DEFAULT 1, `activateCode` VARCHAR(100), `balance` BIGINT DEFAULT 0 ) ENGINE=InnoDB;",
+        "CREATE TABLE IF NOT EXISTS `user` ( `id` VARCHAR(100) PRIMARY KEY, `name` VARCHAR(200), `email` VARCHAR(100), `photoURL` VARCHAR(1000), `admin` TINYINT DEFAULT 0, `suspended` TINYINT DEFAULT 1, `activateCode` VARCHAR(100), `balance` BIGINT DEFAULT 25000 ) ENGINE=InnoDB;",
     team:
         "CREATE TABLE IF NOT EXISTS `team` ( `id` VARCHAR(5) PRIMARY KEY, `name` VARCHAR(100), `positionLastYear` INTEGER(1), `titles` INTEGER(2) DEFAULT 0) ENGINE=InnoDB;",
     player:
@@ -15,7 +15,7 @@ var _tables = {
     result:
         "CREATE TABLE IF NOT EXISTS `result` ( `id` INTEGER(7) PRIMARY KEY AUTO_INCREMENT, `result` VARCHAR(100), `pot` INTEGER(4) REFERENCES `pot` (`id`) )",
     pot:
-        "CREATE TABLE IF NOT EXISTS `pot` ( `id` INTEGER(4) PRIMARY KEY AUTO_INCREMENT, `displayName` VARCHAR(200) NOT NULL, `openTime` DATETIME, `closeTime` DATETIME, `isTeamLevel` TINYINT DEFAULT 0, `multiplierHome` INTEGER(3) DEFAULT 1, `multiplierAway` INTEGER(3) DEFAULT 1, `match` INTEGER(3) REFERENCES `match`(`id`) ) ENGINE=InnoDB;",
+        "CREATE TABLE IF NOT EXISTS `pot` ( `id` INTEGER(4) PRIMARY KEY AUTO_INCREMENT, `displayName` VARCHAR(200) NOT NULL, `openTime` DATETIME, `closeTime` DATETIME, `isTeamLevel` TINYINT DEFAULT 0, `multiplierHome` INTEGER(3) DEFAULT 1, `multiplierAway` INTEGER(3) DEFAULT 1, `match` INTEGER(3) DEFAULT NULL REFERENCES `match`(`id`) ) ENGINE=InnoDB;",
     staticPot:
         "CREATE TABLE IF NOT EXISTS `staticPot` ( `id` INTEGER(1) PRIMARY KEY AUTO_INCREMENT, `displayName` VARCHAR(200) NOT NULL ) ENGINE=InnoDB;",
     bet:
@@ -110,6 +110,22 @@ function _initializeData() {
                     ['Most Dot-balls by Bowler']
                 ];
                 connection.query("INSERT INTO `staticPot` (`displayName`) VALUES ?", [values], callback);
+            },
+            function(results) {
+                // Initialize Long-Term Pots
+                var callback = arguments[arguments.length-1];
+                var values = [];
+                values.push([ 'Team - 1st Position', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 1 ]);
+                values.push([ 'Team - 2nd Position', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 1 ]);
+                values.push([ 'Team - 3rd Position', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 1 ]);
+                values.push([ 'Fairplay Team', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 1 ]);
+                values.push([ 'Highest Run Scorer', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 0 ]);
+                values.push([ 'Highest Wicket Taker', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 0 ]);
+                values.push([ 'Emerging Player', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 0 ]);
+                values.push([ 'Player who hit most 6s', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 0 ]);
+                values.push([ 'Player who hit most 4s', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 0 ]);
+                values.push([ 'Best Catch', util.getSQLDate(new Date()), '2017-04-05 00:00:00', 0 ]);
+                connection.query("INSERT INTO `pot` (`displayName`, `openTime`, `closeTime`, `isTeamLevel`) VALUES ?", [values], callback);
             },
             function(results) {
                 // Fetch Match Details for the Next Step

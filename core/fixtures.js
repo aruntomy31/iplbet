@@ -92,12 +92,12 @@ module.exports = [
         away: "GL",
         fixture: "21/4,8"
     }, {
-        home: "DD",
-        away: "MI",
-        fixture: "22/4,4"
-    }, {
         home: "RPS",
         away: "SRH",
+        fixture: "22/4,4"
+    }, {
+        home: "MI",
+        away: "DD",
         fixture: "22/4,8"
     }, {
         home: "GL",
@@ -176,8 +176,8 @@ module.exports = [
         away: "RPS",
         fixture: "6/5,4"
     }, {
-        home: "MI",
-        away: "DD",
+        home: "DD",
+        away: "MI",
         fixture: "6/5,8"
     }, {
         home: "RCB",

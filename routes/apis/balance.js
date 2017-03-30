@@ -86,6 +86,11 @@ router.post('/transfer', util.checkActiveUser, function (request, response) {
     var data = request.body ? request.body : undefined;
     var message = null;
     try {
+        if(request.user.transfer !== "enabled") {
+            message = "Transfers not allowed.";
+            throw message;
+        }
+        
         if (!data || !data.to || !data.amount || !Number.isInteger(data.amount)) {
             message = "Please provide appropriate data";
             throw message;
@@ -94,8 +99,8 @@ router.post('/transfer', util.checkActiveUser, function (request, response) {
         message = "Please provide a valid number";
         data.amount = util.checkInteger(data.amount, message);
         
-        if (data.amount <= 0) {
-            message = "Please enter a valid non-zero amount.";
+        if (data.amount < 1000) {
+            message = "Please enter a valid amount: Non-Zero and Amount should be at least 1000.";
             throw message;
         }
 
