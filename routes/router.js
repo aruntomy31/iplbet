@@ -12,24 +12,24 @@ var adminRoutes = require('./admin');
 
 router.get('/', function (request, response) {
     try {
-        if(request.isAuthenticated()) response.redirect('/users');
+        if (request.isAuthenticated()) response.redirect('/users');
         else {
             response.render('pages/index', {
                 title: 'BettingBad : Home',
                 active: 'home'
             });
         }
-    } catch(error) {
+    } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
         response.redirect('/error');
     }
 });
 
-router.get('/privacy', function(request, response) {
+router.get('/privacy', function (request, response) {
     response.status(200).send("Privacy Policy");
 });
 
-router.get('/terms', function(request, response) {
+router.get('/terms', function (request, response) {
     response.status(200).send("Terms and Conditions");
 });
 
@@ -39,7 +39,7 @@ router.get('/fixtures', function (request, response) {
             title: 'BettingBad : Fixtures',
             active: 'fixtures'
         });
-    } catch(error) {
+    } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
         response.redirect('/error');
     }
@@ -51,7 +51,7 @@ router.get('/rules', function (request, response) {
             title: 'BettingBad : Rules',
             active: 'rules'
         });
-    } catch(error) {
+    } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
         response.redirect('/error');
     }
@@ -63,7 +63,7 @@ router.get('/prizes', function (request, response) {
             title: 'BettingBad : Prizes',
             active: 'prizes'
         });
-    } catch(error) {
+    } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
         response.redirect('/error');
     }
@@ -75,25 +75,37 @@ router.get('/stats', function (request, response) {
             title: 'BettingBad : Statistics',
             active: 'stats'
         });
-    } catch(error) {
+    } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
         response.redirect('/error');
     }
 });
 
-router.get('/error', function(request, response) {
+router.get('/error', function (request, response) {
     try {
         response.render('pages/error', {
             title: 'Error',
             active: ''
         });
-    } catch(error) {
+    } catch (error) {
         console.log("Unknown Error Occurred on error page: " + error);
         console.log("Error Stack Trace: " + error.stack);
         response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
     }
 });
 
+router.get('/leaders', function (request, response) {
+    try {
+        response.render('pages/leader', {
+            title: 'Leaderboard',
+            active: 'leaders'
+        });
+    } catch (error) {
+        console.log("Unknown Error Occurred on error page: " + error);
+        console.log("Error Stack Trace: " + error.stack);
+        response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
+    }
+});
 
 router.use('/ipl', iplRoutes);
 

@@ -30,7 +30,7 @@ router.get('/open', function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT * FROM `pot` WHERE `openTime` <= CURRENT_TIMESTAMP AND `closeTime` >= CURRENT_TIMESTAMP", callback);
+                connection.query("SELECT * FROM `pot` WHERE `openTime` <= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30') AND `closeTime` >= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30')", callback);
             }
         ], connection, function(error, pots) {
             if(error) return response.status(500).send("Unable to fetch pots.");
@@ -49,7 +49,7 @@ router.get('/closed', function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT * FROM `pot` WHERE `closeTime` < CURRENT_TIMESTAMP", callback);
+                connection.query("SELECT * FROM `pot` WHERE `closeTime` < CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30')", callback);
             }
         ], connection, function(error, pots) {
             if(error) return response.status(500).send("Unable to fetch pots.");
@@ -242,7 +242,7 @@ router.get('/open/teams', util.checkAdmin, function(request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT p.`id` AS pot, m.`id` AS `match`, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CURRENT_TIMESTAMP AND p.`closeTime` >= CURRENT_TIMESTAMP", callback);
+                connection.query("SELECT p.`id` AS `pot`, m.`id` AS `match`, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30') AND p.`closeTime` >= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30')", callback);
             },
             function(pots) {
                 var callback = arguments[arguments.length-1];
@@ -251,7 +251,7 @@ router.get('/open/teams', util.checkAdmin, function(request, response) {
             function(inPots, result) {
                 var callback = arguments[arguments.length-1];
                 result.teams = {};
-                connection.query("SELECT b.`pot` AS pot, b.`betTeam` AS team, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + inPots.join(",") + ") GROUP BY b.`betTeam` ORDER BY b.`pot`", function(error, betGroups) {
+                connection.query("SELECT b.`pot` AS `pot`, b.`betTeam` AS team, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + inPots.join(",") + ") GROUP BY b.`betTeam` ORDER BY b.`pot`", function(error, betGroups) {
                     if(error) return callback(error);
                     else return callback(null, result, betGroups);
                 });
@@ -284,7 +284,7 @@ router.get('/open/players', util.checkAdmin, function(request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT p.`id` AS pot, m.`id` AS match, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CURRENT_TIMESTAMP AND p.`closeTime` >= CURRENT_TIMESTAMP", callback);
+                connection.query("SELECT p.`id` AS `pot`, m.`id` AS match, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30') AND p.`closeTime` >= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30')", callback);
             },
             function(pots) {
                 var callback = arguments[arguments.length-1];
@@ -293,7 +293,7 @@ router.get('/open/players', util.checkAdmin, function(request, response) {
             function(inPots, result) {
                 var callback = arguments[arguments.length-1];
                 result.players = {};
-                connection.query("SELECT b.`pot` AS pot, b.`betOn` AS player, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + pots.join(",") + ") GROUP BY b.`betOn` ORDER BY b.`pot`", function(error, betGroups) {
+                connection.query("SELECT b.`pot` AS `pot`, b.`betOn` AS player, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + pots.join(",") + ") GROUP BY b.`betOn` ORDER BY b.`pot`", function(error, betGroups) {
                     if(error) return callback(error);
                     else return callback(null, result, betGroups);
                 });
@@ -465,27 +465,35 @@ router.post('/update/long-term', util.checkAdmin, function (request, response) {
         var tasks = [];
         var pots = Object.keys(data);
         
-        var connection = mysql.getConnection();
-        pots.forEach(potId => {
-            
+        // Validations
+        for(var potId of pots) {
             message = "Please enter a valid openTime";
-            var openTime = util.getSQLDate(new Date(data[potId].openTime));
+            var current = new Date();
+            var date = new Date(data[potId].openTime);
+            if(isNaN(date.getTime())) throw message;
+            data[potId].openTime = util.getSQLDate(date);
 
             message = "Please enter a valid closeTime";
-            var closeTime = util.getSQLDate(new Date(data[potId].closeTime));
+            date = new Date(data[potId].closeTime);
+            if(isNaN(date.getTime()) || date.getTime() <= current.getTime() ) throw message;
+            data[potId].closeTime = util.getSQLDate(date);
 
             message = "Please enter a valid multiplier for the pot";
-            var multiplier = util.checkInteger(data[potId].multiplier, message);
+            data[potId].multiplier = util.checkInteger(data[potId].multiplier, message);
 
-            if(multiplier < 1) {
+            if(data[potId].multiplier < 1) {
                 message = "Multiplier value cannot be less than 1.";
                 throw message;
             }
-            
+        }
+        
+        
+        var connection = mysql.getConnection();
+        pots.forEach(potId => {
             tasks.push(
                 function() {
                     var callback = arguments[arguments.length-1];
-                    connection.query("UPDATE `pot` SET `openTime` = ?, `closeTime` = ?, `multiplierHome` = ? WHERE `id` = ? AND `match` IS NULL", [ openTime, closeTime, multiplier, potId ], callback);
+                    connection.query("UPDATE `pot` SET `openTime` = ?, `closeTime` = ?, `multiplierHome` = ? WHERE `id` = ? AND `match` IS NULL", [ data[potId].openTime, data[potId].closeTime, data[potId].multiplier, potId ], callback);
                 }
             );
         });

@@ -97,7 +97,7 @@ module.exports = function(app, passport) {
         clientID      : configuration.facebook.clientID,
         clientSecret  : configuration.facebook.clientSecret,
         callbackURL   : configuration.facebook.callbackURL,
-        profileFields : [ 'id', 'emails', 'name', 'displayName', 'gender' ]
+        profileFields : [ 'id', 'emails', 'name', 'displayName', 'gender', 'photos' ]
     }, function(token, refreshToken, user, done) {
         checkUserExistOrAdd(_createUserObject(user.id, user.displayName, user.emails[0].value, user.photos[0].value), done);
     }));

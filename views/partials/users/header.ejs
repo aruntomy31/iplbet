@@ -36,6 +36,7 @@
         </div>
         <a class="<% if(active === 'bets'){ %> <%= 'active' %> <% } %> item" href="/users/betzone">Bets</a>
         <% if(transfer === 'enabled') { %> <a class="<% if(active === 'transfer'){ %> <%= 'active' %> <% } %> item" href="/users/transfer">Transfers</a> <% } %>
+        <a class="<% if(active === 'leaders'){ %> <%= 'active' %> <% } %> item" href="/users/leaders">Leaderboard</a>
         <div class="ui right dropdown item">
             <%= user.name %><i class="dropdown icon"></i>
                 <div class="menu">

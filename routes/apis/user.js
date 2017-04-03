@@ -43,6 +43,24 @@ router.get('/active', util.checkActiveUser, function (request, response) {
     }
 });
 
+router.get('/activeadm', util.checkAdmin, function (request, response) {
+    try {
+        var connection = mysql.getConnection();
+        mysql.transaction([
+            function(callback) {
+                connection.query("SELECT * FROM `user` WHERE `suspended` = 0 AND `admin` = 0", callback);
+            }
+        ], connection, function(error, users) {
+            if(error) return response.status(500).send("Unable to fetch users.");
+            return response.status(200).send(JSON.stringify(users));
+        });
+    } catch(exception) {
+        console.log("Error occurred while fetching all active users: " + exception);
+        console.log("Error Stack Trace: " + exception.stack);
+        return response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
+    }
+});
+
 // 3. Activate User with Activation Code [Directly from mail] [/apis/user/activate/:user/:code]
 router.get('/activate/:user/:code', function (request, response) {
     var message = null;
@@ -184,7 +202,7 @@ router.get('/leaderboard', function(request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT u.`name` FROM `user` u ORDER BY u.`balance` LIMIT ?", top, callback);
+                connection.query("SELECT u.`name` FROM `user` u WHERE u.`suspended` = 0 AND u.`admin` = 0 ORDER BY u.`balance` LIMIT ?", top, callback);
             }
         ], connection, function(error, users) {
             if(error) return response.status(500).send("Error while fetching leaderboard: " + error);

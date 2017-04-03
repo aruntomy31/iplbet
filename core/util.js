@@ -1,7 +1,7 @@
 /*jslint node:true*/
 'use strict';
 
-var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+var moment = require('moment');
 
 module.exports.checkUser = function (request, response, next) {
     if (request.isAuthenticated()) {
@@ -15,7 +15,7 @@ module.exports.checkUser = function (request, response, next) {
 module.exports.checkActiveUser = function (request, response, next) {
     if (request.isAuthenticated()) {
         if (!request.user.suspended) return next();
-        else response.redirect('/error');
+        else response.redirect('/users/error');
     } else {
         response.redirect('/');
     }
@@ -41,12 +41,11 @@ module.exports.checkInteger = function(integer, message) {
 }
 
 module.exports.getReadableFixture = function (date) {
-    var fixture = {};
-    var dd = date.getDate();
-    dd = dd < 10 ? "0" + dd : dd;
-    fixture.date = dd + "-" + months[date.getMonth()] + "-" + date.getFullYear();
-    fixture.time = date.toLocaleTimeString();
-    return fixture;
+    date = moment(date).utcOffset("+0530");
+    return {
+        date : date.format("DD-MMM-YYYY"),
+        time : date.format("hh:mm:ss A")
+    };
 };
 
 module.exports.getIPLDate = function (string) {
@@ -58,11 +57,13 @@ module.exports.getIPLDate = function (string) {
 };
 
 module.exports.getSQLDate = function (date) {
-    var dd = date.getDate();
-    dd = dd < 10 ? "0" + dd : dd;
-    var mm = date.getMonth() + 1;
-    mm = mm < 10 ? "0" + mm : mm;
-    return date.getFullYear() + "-" + mm + "-" + dd + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    date = moment(date).utcOffset("+0530");
+    return date.format("YYYY-MM-DD HH:mm:ss");
+};
+
+module.exports.istToUtc = function(date) {
+    date = moment(date).utcOffset("-0530");
+    return new Date(date.format("YYYY-MM-DD HH:mm:ss"));
 };
 
 module.exports.subtractDate = function (date, difference) {

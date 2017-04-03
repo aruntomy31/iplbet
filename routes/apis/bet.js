@@ -279,11 +279,8 @@ router.post('/place', util.checkActiveUser, function (request, response) {
                         timedOutPots.push(pot.name);
                     } else {
                         if(!data[pot.id].betOn || !data[pot.id].betAmount) continue;
-
                         var betTeam = pot.isTeamLevel ? teams[data[pot.id].betOn] : players[data[pot.id].betOn];
-                        var multiplier = pot.multiplierHome;
-
-                        values.push([ pot.id, request.user.id, data[pot.id].betOn, betTeam, data[pot.id].betAmount, multiplier ]);
+                        values.push([ pot.id, request.user.id, data[pot.id].betOn, betTeam, data[pot.id].betAmount, pot.multiplier ]);
                         balance -= data[pot.id].betAmount;
                         transactions[pot.id] = balance;
                     }

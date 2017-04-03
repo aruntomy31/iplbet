@@ -1,6 +1,7 @@
 /*jslint node:true*/
 'use strict';
 
+var util = require('../core/util');
 var mysql = require('../core/mysql');
 var router = require('express').Router();
 
@@ -44,11 +45,11 @@ router.get('/', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
     }
 });
 
-router.get('/betzone', function (request, response) {
+router.get('/betzone', util.checkActiveUser, function (request, response) {
     try {
         response.render('pages/users/placebet', {
             title: 'BettingBad : Place Bet',
@@ -60,11 +61,11 @@ router.get('/betzone', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
     }
 });
 
-router.get('/betzone/:match', function (request, response) {
+router.get('/betzone/:match', util.checkActiveUser, function (request, response) {
     try {
         response.render('pages/users/placebet', {
             title: 'BettingBad : Place Bet',
@@ -77,11 +78,11 @@ router.get('/betzone/:match', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
     }
 });
 
-router.get('/transfer', function (request, response) {
+router.get('/transfer', util.checkActiveUser, function (request, response) {
     try {
         if (request.user.transfer === 'disabled') {
             response.redirect('/users');
@@ -97,7 +98,7 @@ router.get('/transfer', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
     }
 });
 
@@ -113,7 +114,7 @@ router.get('/fixtures', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
     }
 });
 
@@ -129,7 +130,7 @@ router.get('/rules', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
     }
 });
 
@@ -145,7 +146,7 @@ router.get('/prizes', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
     }
 });
 
@@ -161,7 +162,41 @@ router.get('/stats', function (request, response) {
         });
     } catch (error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/users/error');
+    }
+});
+
+router.get('/error', function(request, response) {
+    try {
+        response.render('pages/users/error', {
+            title: 'Error',
+            active: '',
+            transfer: request.user.transfer,
+			user: {
+				name: request.user.name
+			}
+        });
+    } catch(error) {
+        console.log("Unknown Error Occurred on error page: " + error);
+        console.log("Error Stack Trace: " + error.stack);
+        response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
+    }
+});
+
+router.get('/leaders', function (request, response) {
+    try {
+        response.render('pages/users/leader', {
+            title: 'Leaderboard',
+            active: 'leaders',
+            transfer: request.user.transfer,
+			user: {
+				name: request.user.name
+			}
+        });
+    } catch (error) {
+        console.log("Unknown Error Occurred on error page: " + error);
+        console.log("Error Stack Trace: " + error.stack);
+        response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
     }
 });
 

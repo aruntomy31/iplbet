@@ -15,7 +15,7 @@ router.get('/', function (request, response) {
         });
     } catch(error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/admin/error');
     }
 });
 
@@ -30,7 +30,7 @@ router.get('/users', function (request, response) {
         });
     } catch(error) {
         console.log("Error Stack Trace: " + error.stack);
-        response.redirect('/error');
+        response.redirect('/admin/error');
     }
 });
 
@@ -45,7 +45,7 @@ router.get('/pots', function (request, response) {
 		});
 	} catch(error) {
         console.log("Error Stack Trace: " + error.stack);
-		response.redirect('/error');
+		response.redirect('/admin/error');
 	}
 });
 
@@ -60,7 +60,7 @@ router.get('/results', function (request, response) {
 		});
 	} catch(error) {
         console.log("Error Stack Trace: " + error.stack);
-		response.redirect('/error');
+		response.redirect('/admin/error');
 	}
 });
 
@@ -75,7 +75,7 @@ router.get('/stats', function (request, response) {
 		});
 	} catch(error) {
         console.log("Error Stack Trace: " + error.stack);
-		response.redirect('/error');
+		response.redirect('/admin/error');
 	}
 });
 
@@ -90,8 +90,40 @@ router.get('/transfers', function (request, response) {
 		});
 	} catch(error) {
         console.log("Error Stack Trace: " + error.stack);
-		response.redirect('/error');
+		response.redirect('/admin/error');
 	}
+});
+
+router.get('/error', function(request, response) {
+    try {
+        response.render('pages/admin/error', {
+            title: 'Error',
+            active: '',
+			user: {
+				name: request.user.name
+			}
+        });
+    } catch(error) {
+        console.log("Unknown Error Occurred on error page: " + error);
+        console.log("Error Stack Trace: " + error.stack);
+        response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
+    }
+});
+
+router.get('/rank', function(request, response) {
+    try {
+        response.render('pages/admin/rank', {
+            title: 'Rank List',
+            active: 'rank',
+			user: {
+				name: request.user.name
+			}
+        });
+    } catch(error) {
+        console.log("Unknown Error Occurred on error page: " + error);
+        console.log("Error Stack Trace: " + error.stack);
+        response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
+    }
 });
 
 module.exports = router;
