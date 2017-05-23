@@ -9,7 +9,9 @@
                     <div class="ui form">
                         <div class="field">
                             <label>Transfer Money To</label>
-                            <select name="to" id="transferTo" class="ui fluid search dropdown"></select>
+                            <select name="to" id="transferTo" class="ui fluid search dropdown">
+                                <option value="-1">Select User</option>
+                            </select>
                         </div>
                         <div class="ui segment">
                             <div class="ui range" id="range-2"></div>
@@ -43,23 +45,31 @@
                                     to: $('#transferTo').val(),
                                     amount: parseInt($('#input-2').val(), 10)
                                 };
-                                $.ajax('/apis/balance/transfer', {
-                                    method: 'POST',
-                                    contentType: 'application/json',
-                                    data: JSON.stringify(payload),
-                                    success: function (data) {
-                                        $('.modal .header')[0].textContent = 'Success';
-                                        $('.modal .content p')[0].textContent = data;
-                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
-                                        $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
-                                    },
-                                    error: function (error) {
-                                        $('.modal .header')[0].textContent = error.statusText;
-                                        $('.modal .content p')[0].textContent = error.responseText;
-                                        $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
-                                        $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
-                                    }
-                                });
+                                if (payload.to === -1 || payload.amount < 1000) {
+                                    $('.modal .header')[0].textContent = 'Transfer Error';
+                                    $('.modal .content p')[0].textContent = 'You should select an active user and transfer amounts greater than 1000.';
+                                    $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                    $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                                } else {
+                                    $.ajax('/apis/balance/transfer', {
+                                        method: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify(payload),
+                                        success: function (data) {
+                                            $('.modal .header')[0].textContent = 'Success';
+                                            $('.modal .content p')[0].textContent = data;
+                                            $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                            $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                                        },
+                                        error: function (error) {
+                                            $('.modal .header')[0].textContent = error.statusText;
+                                            $('.modal .content p')[0].textContent = error.responseText;
+                                            $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
+                                            $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
+                                        }
+                                    });
+                                }
+
                             });
                             $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
                         }

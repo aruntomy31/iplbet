@@ -11,7 +11,7 @@ router.get('/all', util.checkAdmin, function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT * FROM `user`", callback);
+                connection.query("SELECT * FROM `user` ORDER BY `name`", callback);
             }
         ], connection, function(error, users) {
             if(error) return response.status(500).send("Unable to fetch users.");
@@ -48,7 +48,7 @@ router.get('/activeadm', util.checkAdmin, function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT * FROM `user` WHERE `suspended` = 0 AND `admin` = 0", callback);
+                connection.query("SELECT * FROM `user` WHERE `suspended` = 0 AND `admin` = 0 ORDER BY `balance` DESC, `name` ASC", callback);
             }
         ], connection, function(error, users) {
             if(error) return response.status(500).send("Unable to fetch users.");
@@ -202,7 +202,7 @@ router.get('/leaderboard', function(request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT u.`name` FROM `user` u WHERE u.`suspended` = 0 AND u.`admin` = 0 ORDER BY u.`balance` LIMIT ?", top, callback);
+                connection.query("SELECT u.`name` FROM `user` u WHERE u.`suspended` = 0 AND u.`admin` = 0 ORDER BY u.`balance` DESC LIMIT ?", top, callback);
             }
         ], connection, function(error, users) {
             if(error) return response.status(500).send("Error while fetching leaderboard: " + error);

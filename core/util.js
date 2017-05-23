@@ -30,10 +30,10 @@ module.exports.checkAdmin = function (request, response, next) {
     }
 };
 
-module.exports.checkInteger = function(integer, message) {
+module.exports.checkInteger = function (integer, message) {
     try {
         return parseInt(integer, 10);
-    } catch(error) {
+    } catch (error) {
         console.log("Check Integer Failed: " + error);
         console.log("Error Stack Trace" + error.stack);
         throw message;
@@ -43,8 +43,8 @@ module.exports.checkInteger = function(integer, message) {
 module.exports.getReadableFixture = function (date) {
     date = moment(date).utcOffset("+0530");
     return {
-        date : date.format("DD-MMM-YYYY"),
-        time : date.format("hh:mm:ss A")
+        date: date.format("DD-MMM-YYYY"),
+        time: date.format("hh:mm:ss A")
     };
 };
 
@@ -61,9 +61,23 @@ module.exports.getSQLDate = function (date) {
     return date.format("YYYY-MM-DD HH:mm:ss");
 };
 
-module.exports.istToUtc = function(date) {
+
+module.exports.istToUtc = function (date) {
     date = moment(date).utcOffset("-0530");
     return new Date(date.format("YYYY-MM-DD HH:mm:ss"));
+};
+
+module.exports.gcdArray = function (a) {
+    var gcd = a[0];
+    for (var i = 1; i < a.length; i++) {
+        gcd = this.gcd(gcd, a[i]);
+    }
+    return gcd;
+};
+
+module.exports.gcd = function (a, b) {
+    if (a === 0) return b;
+    else return gcd(b % a, a);
 };
 
 module.exports.subtractDate = function (date, difference) {

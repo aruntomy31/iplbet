@@ -5,7 +5,7 @@ module.exports = {
         positionLastYear: 6,
         titles: 0,
 		players: [ "Zaheer Khan", "Ankit Bawne", "Khaleel Ahmed", "Corey Anderson", "Murugan Ashwin", "Sam Billings", "Carlos Brathwaite", 
-			"Pat Cummins", "Quinton de Kock", "JP Duminy", "Shreyas Iyer", "Angelo Mathews", "CV Milind", "Amit Mishra", "Mohammed Shami",
+			"Pat Cummins", "Quinton de Kock", "Ben Hilfenhaus", "Shreyas Iyer", "Angelo Mathews", "CV Milind", "Amit Mishra", "Mohammed Shami",
 			"Chris Morris", "Shahbaz Nadeem", "Karun Nair", "Rishabh Pant", "Pratyush Singh", "Kagiso Rabada", "Navdeep Saini",
 			"Sanju Samson", "Shashank Singh", "Aditya Tare", "Jayant Yadav" ]
 	},
@@ -22,10 +22,10 @@ module.exports = {
         name: "Kings XI Punjab",
         positionLastYear: 8,
         titles: 0,
-        players: [ "Murali Vijay", "Varun Aaron", "Hashim Amla", "Anureet Singh", "Armaan Jaffer", "KC Cariappa", "Martin Guptill",
-		"Gurkeerat Mann Singh", "Matt Henry", "Shaun Marsh", "Glenn Maxwell", "David Miller", "Eoin Morgan", "Nikhil Naik",
+        players: [ "Glenn Maxwell", "Varun Aaron", "Hashim Amla", "Anureet Singh", "Armaan Jaffer", "KC Cariappa", "Martin Guptill",
+		"Gurkeerat Mann Singh", "Matt Henry", "Shaun Marsh", "Ishant Sharma", "David Miller", "Eoin Morgan", "Nikhil Naik",
 		"T Natarajan", "Axar Patel", "Wriddhiman Saha", "Pradeep Sahu", "Darren Sammy", "Sandeep Sharma", "Mohit Sharma",
-		"Rinku Singh", "Marcus Stoinis", "Swapnil Singh", "Rahul Tewatia", "Shardul Thakur", "Manan Vohra" ]
+		"Rinku Singh", "Marcus Stoinis", "Swapnil Singh", "Rahul Tewatia", "Manan Vohra" ]
     },
 	KKR: {
         name: "Kolkata Knight Riders",
@@ -33,7 +33,7 @@ module.exports = {
         titles: 2,
         players: [ "Gautam Gambhir", "Trent Boult", "Darren Bravo", "Piyush Chawla", "Nathan Coulter-Nile", "Rishi Dhawan", "Sayan Ghosh",
 		"Sheldon Jackson", "Ishank Jaggi", "Kuldeep Yadav", "Chris Lynn", "Sunil Narine", "Manish Pandey", "Yusuf Pathan", "Rovman Powell",
-		"Ankit Rajpoot", "Andre Russell", "R Sanjay Yadav", "Shakib Al Hasan", "Robin Uthappa", "Chris Woakes", "Suryakumar Yadav", "Umesh Yadav" ]
+		"Ankit Rajpoot", "Colin de Grandhomme", "R Sanjay Yadav", "Shakib Al Hasan", "Robin Uthappa", "Chris Woakes", "Suryakumar Yadav", "Umesh Yadav" ]
     },
 	MI: {
         name: "Mumbai Indians",
@@ -48,9 +48,9 @@ module.exports = {
         name: "Rising Pune Supergiant",
         positionLastYear: 7,
         titles: 0,
-        players: [ "Steve Smith", "Mayank Agarwal", "Ankit Sharma", "Baba Aparajith", "Ravichandra Ashwin", "Ankush Bains", "Rajat Bhatia",
-		"Deepak Chahar", "Rahul Chahar", "Dan Christian", "MS Dhoni", "Ashok Dinda", "Francois du Plessis", "Lockie Ferguson", "Jaskaran Singh",
+        players: [ "Steve Smith", "Mayank Agarwal", "Ankit Sharma", "Baba Aparajith", "Imran Tahir", "Ankush Bains", "Rajat Bhatia",
 		"Usman Khawaja", "Mitchell Marsh", "Ajinkya Rahane", "Saurabh Kumar", "Ben Stokes", "Milind Tandon", "Manoj Tiwary", "Adam Zampa",
+		"Deepak Chahar", "Rahul Chahar", "Dan Christian", "MS Dhoni", "Ashok Dinda", "Francois du Plessis", "Lockie Ferguson", "Jaskaran Singh",
 		"Jaydev Unadkat", "Ishwar Pandey", "Rahul Tripathi" ]
     },
 	RCB: {

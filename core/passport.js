@@ -4,7 +4,7 @@ var mailer = require('./mailer');
 var configuration = require('./auth');
 var mysql = require('./mysql');
 
-var adminEmail = "ahardik93@ymail.com";
+var adminEmail = "deepak.kn@sap.com";
 
 var Strategy = {
     Google   : require('passport-google-oauth').OAuth2Strategy,

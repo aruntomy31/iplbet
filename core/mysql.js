@@ -7,7 +7,7 @@ var mysql = require('mysql');
 var prod = true;
 
 module.exports.config = {
-    host: "iplbet.cxsqpqjzmj8y.us-west-2.rds.amazonaws.com",
+    host: "iplbet2.cxsqpqjzmj8y.us-west-2.rds.amazonaws.com",
     port: 3306,
     user: "iplbet",
     password: "Toor1234",

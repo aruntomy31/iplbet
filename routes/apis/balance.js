@@ -14,7 +14,7 @@ router.post('/update/all', util.checkAdmin, function (request, response) {
             message = "Provide Amount";
             throw message;
         }
-        
+
         message = "Please provide a valid number";
         data.amount = util.checkInteger(data.amount, message);
 
@@ -50,7 +50,7 @@ router.post('/update/user', util.checkAdmin, function (request, response) {
             message = "Provide UserId and Amount";
             throw message;
         }
-        
+
         message = "Please provide a valid number";
         data.amount = util.checkInteger(data.amount, message);
 
@@ -90,7 +90,7 @@ router.post('/transfer', util.checkActiveUser, function (request, response) {
             message = "Transfers not allowed.";
             throw message;
         }
-        
+
         if (!data || !data.to || !data.amount || !Number.isInteger(data.amount)) {
             message = "Please provide appropriate data";
             throw message;
@@ -98,7 +98,7 @@ router.post('/transfer', util.checkActiveUser, function (request, response) {
 
         message = "Please provide a valid number";
         data.amount = util.checkInteger(data.amount, message);
-        
+
         if (data.amount < 1000) {
             message = "Please enter a valid amount: Non-Zero and Amount should be at least 1000.";
             throw message;
@@ -109,8 +109,13 @@ router.post('/transfer', util.checkActiveUser, function (request, response) {
             function(callback) {
                 connection.query("CALL Transfer(?, ?, ?)", [ request.user.id, data.to, data.amount ], function(error, results) {
                     if(error) return callback(error);
-                    else if(results[0][0].error) return callback(results[0][0].error);
-                    else return callback(null, results[0][0]);
+                    else {
+                      if(results[0][0] && !results[0][0].error) return callback(null, results[0][0]);
+                      else {
+                        if(results[0][0] && results[0][0].error) return callback(results[0][0].error);
+                        else return callback("Unable to make the transfer");
+                      }
+                    }
                 });
             }
         ], connection, function(error, to) {

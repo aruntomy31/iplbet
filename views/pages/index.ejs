@@ -15,17 +15,27 @@
             }
             return array;
         }
+
     </script>
+    <style>
+        .ui.four.cards>.card {
+            width: calc(25% - 1.5em);
+            margin-left: .75em;
+            margin-right: .75em;
+            min-width: 320px;
+        }
+
+    </style>
 
     <div class="ui link four cards segment">
     </div>
     <script>
         $.ajax('/apis/team/all', {
-            success: function (data) {
+            success: function(data) {
                 data = JSON.parse(data);
                 data = shuffle(data);
                 var parent = document.querySelector('.ui.link.cards');
-                data.forEach(function (team) {
+                data.forEach(function(team) {
                     var card = document.createElement('div');
                     card.setAttribute('class', 'ui centered raised card');
 
@@ -72,5 +82,6 @@
                 });
             }
         });
+
     </script>
     <% include ../partials/footer.ejs %>

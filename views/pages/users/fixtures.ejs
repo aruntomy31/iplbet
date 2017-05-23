@@ -55,7 +55,7 @@
                     divMiddleSubHeader.setAttribute('class', 'sub header');
                     if (match.result) {
                         divMiddleContent.appendChild(document.createTextNode(match.result.won + ' won'));
-                        divMiddleSubHeader.textContent = 'by ' + match.result.by;
+//                        divMiddleSubHeader.textContent = 'by ' + match.result.by;
                     } else {
                         divMiddleContent.appendChild(document.createTextNode(match.fixture.date));
                         divMiddleSubHeader.textContent = match.fixture.time;

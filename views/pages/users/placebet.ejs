@@ -1,4 +1,10 @@
 <% include ../../partials/users/header.ejs %>
+    <style>
+        .ui.selection.search.dropdown {
+            width: 100% !important;
+        }
+
+    </style>
     <% if(user.betmatch) { %>
         <%- '<script>var matchID ="' +  user.betmatch + '";</script>' %>
             <% } %>
@@ -56,10 +62,10 @@
                 <script>
                     $('.accordion').accordion();
                     $.ajax('/apis/pot/long-term', {
-                        success: function (data) {
+                        success: function(data) {
                             data = JSON.parse(data);
                             var parent = $('#ltbet tbody')[0];
-                            data.forEach(function (bet) {
+                            data.forEach(function(bet) {
                                 var tr = document.createElement('tr');
                                 tr.setAttribute('id', 'lt-' + bet.id);
 
@@ -68,21 +74,20 @@
                                 tr.appendChild(td1);
 
                                 var td2 = document.createElement('td');
-                                var selection = document.createElement('div');
-                                selection.setAttribute('class', 'ui selection search dropdown');
-                                selection.setAttribute('style', 'width:100%');
-                                selection.innerHTML = '<input type="hidden" name="choices" /><i class="dropdown icon"></i><div class="default text">Place Bet On</div>';
-                                var menu = document.createElement('div');
-                                menu.setAttribute('class', 'menu');
-                                bet.options.forEach(function (choice) {
-                                    var opt = document.createElement('div');
-                                    opt.setAttribute('class', 'item');
-                                    opt.setAttribute('data-value', choice.key);
-                                    opt.textContent = choice.value;
-                                    menu.appendChild(opt);
+                                var select = document.createElement('select');
+                                select.setAttribute('class', 'ui selection search dropdown');
+                                select.setAttribute('style', 'width:100% !important');
+                                var option = document.createElement('option');
+                                option.setAttribute('value', '-1');
+                                option.textContent = "Select a Team/Player";
+                                select.appendChild(option);
+                                bet.options.forEach(function(choice) {
+                                    option = document.createElement('option');
+                                    option.setAttribute('value', choice.key);
+                                    option.textContent = choice.value;
+                                    select.appendChild(option);
                                 });
-                                selection.appendChild(menu);
-                                td2.appendChild(selection);
+                                td2.appendChild(select);
                                 tr.appendChild(td2);
 
                                 var td3 = document.createElement('td');
@@ -110,17 +115,22 @@
                             td.innerHTML = '<button class="ui positive button" id="placeLTBet">Place Bets</button>';
                             tr.appendChild(td);
                             parent.appendChild(tr);
-                            $('#placeLTBet')[0].addEventListener('click', function (oEvent) {
+                            $('#placeLTBet')[0].addEventListener('click', function(oEvent) {
                                 $('.dimmer')[0].setAttribute('class', 'ui active inverted dimmer');
                                 var payload = {};
                                 var rows = $('tr').each((index, element) => {
                                     if (element.id.startsWith('lt')) {
                                         var potID = parseInt(element.id.split('-')[1], 10);
-                                        var betOn = $('#' + element.id).find('input[type=hidden]')[0].value;
+                                        var betOn = $('#' + element.id).find('select').val();
                                         var betAmount = parseInt($('#' + element.id).find('input[type=number]')[0].value, 10);
-                                        if (betAmount >= 1000 && betOn !== '') {
-                                            payload[potID] = { betOn: betOn, betAmount: betAmount };
+                                        if (betAmount >= 1000 && betOn !== '' && betOn !== -1 && betOn !== '-1') {
+                                            payload[potID] = {
+                                                betOn: betOn,
+                                                betAmount: betAmount
+                                            };
                                         }
+                                        $('#' + element.id).find('select').val('-1').change();
+                                        $('#' + element.id).find('input[type=number]').val('');
                                     }
                                 });
 
@@ -128,13 +138,13 @@
                                     method: 'POST',
                                     contentType: 'application/json',
                                     data: JSON.stringify(payload),
-                                    success: function (data) {
+                                    success: function(data) {
                                         $('.modal .header')[0].textContent = 'Success';
                                         $('.modal .content p')[0].textContent = data;
                                         $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
                                         $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
                                     },
-                                    error: function (error) {
+                                    error: function(error) {
                                         $('.modal .header')[0].textContent = error.statusText;
                                         $('.modal .content p')[0].textContent = error.responseText;
                                         $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
@@ -146,11 +156,14 @@
                         }
                     });
                     $.ajax('/apis/bet/user', {
-                        success: function (data) {
+                        success: function(data) {
                             data = JSON.parse(data);
+                            data.sort((entry1, entry2)=>{
+                                return new Date(entry2.betDate) - new Date(entry1.betDate);
+                            });
                             var parent = $('.ui.feed')[0];
 
-                            data.forEach(function (item) {
+                            data.forEach(function(item) {
                                 var event = document.createElement('div');
                                 event.setAttribute('class', 'event');
 
@@ -164,7 +177,7 @@
                                 content.setAttribute('class', 'content');
                                 var summary = document.createElement('div');
                                 summary.setAttribute('class', 'summary');
-                                summary.innerHTML = 'You bet ' + item.betAmount + ' on <a class="user">' + item.betOn + '</a><div class="date">' + item.betDate + '</div>';
+                                summary.innerHTML = 'You bet ' + item.betAmount + ' on <a class="user">' + item.betOn + '</a> for ' + item.potName + ' <div class="date">' + new Date(item.betDate).toLocaleString('en-IN') + '</div>';
                                 content.appendChild(summary);
 
                                 var meta = document.createElement('div');
@@ -190,10 +203,10 @@
                     var matchID = typeof matchID !== 'undefined' ? matchID : null;
                     if (matchID) {
                         $.ajax('/apis/pot/match/' + matchID, {
-                            success: function (data) {
+                            success: function(data) {
                                 data = JSON.parse(data);
                                 var parent = $('#matchbet tbody')[0];
-                                data.forEach(function (bet) {
+                                data.forEach(function(bet) {
                                     var tr = document.createElement('tr');
                                     tr.setAttribute('id', 'match-' + bet.id);
 
@@ -202,21 +215,20 @@
                                     tr.appendChild(td1);
 
                                     var td2 = document.createElement('td');
-                                    var selection = document.createElement('div');
-                                    selection.setAttribute('class', 'ui selection search dropdown');
-                                    selection.setAttribute('style', 'width:100%');
-                                    selection.innerHTML = '<input type="hidden" name="choices" /><i class="dropdown icon"></i><div class="default text">Place Bet On</div>';
-                                    var menu = document.createElement('div');
-                                    menu.setAttribute('class', 'menu');
-                                    bet.options.forEach(function (choice) {
-                                        var opt = document.createElement('div');
-                                        opt.setAttribute('class', 'item');
-                                        opt.setAttribute('data-value', choice.key);
-                                        opt.textContent = choice.value;
-                                        menu.appendChild(opt);
+                                    var select = document.createElement('select');
+                                    select.setAttribute('class', 'ui selection search dropdown');
+                                    select.setAttribute('style', 'width:100% !important');
+                                    var option = document.createElement('option');
+                                    option.setAttribute('value', '-1');
+                                    option.textContent = "Select a Team/Player";
+                                    select.appendChild(option);
+                                    bet.options.forEach(function(choice) {
+                                        option = document.createElement('option');
+                                        option.setAttribute('value', choice.key);
+                                        option.textContent = choice.value;
+                                        select.appendChild(option);
                                     });
-                                    selection.appendChild(menu);
-                                    td2.appendChild(selection);
+                                    td2.appendChild(select);
                                     tr.appendChild(td2);
 
                                     var td3 = document.createElement('td');
@@ -244,17 +256,22 @@
                                 td.innerHTML = '<button class="ui positive button" id="placeMatchBet">Place Bets</button>';
                                 tr.appendChild(td);
                                 parent.appendChild(tr);
-                                $('#placeMatchBet')[0].addEventListener('click', function (oEvent) {
+                                $('#placeMatchBet')[0].addEventListener('click', function(oEvent) {
                                     $('.dimmer')[0].setAttribute('class', 'ui active inverted dimmer');
                                     var payload = {};
                                     var rows = $('tr').each((index, element) => {
                                         if (element.id.startsWith('match')) {
                                             var potID = parseInt(element.id.split('-')[1], 10);
-                                            var betOn = $('#' + element.id).find('input[type=hidden]')[0].value;
+                                            var betOn = $('#' + element.id).find('select').val();
                                             var betAmount = parseInt($('#' + element.id).find('input[type=number]')[0].value, 10);
-                                            if (betAmount >= 1000 && betOn !== '') {
-                                                payload[potID] = { betOn: betOn, betAmount: betAmount };
+                                            if (betAmount >= 1000 && betOn !== '' && betOn !== -1 && betOn !== '-1') {
+                                                payload[potID] = {
+                                                    betOn: betOn,
+                                                    betAmount: betAmount
+                                                };
                                             }
+                                            $('#' + element.id).find('select').val('-1').change();
+                                            $('#' + element.id).find('input[type=number]').val('');
                                         }
                                     });
 
@@ -262,13 +279,13 @@
                                         method: 'POST',
                                         contentType: 'application/json',
                                         data: JSON.stringify(payload),
-                                        success: function (data) {
+                                        success: function(data) {
                                             $('.modal .header')[0].textContent = 'Success';
                                             $('.modal .content p')[0].textContent = data;
                                             $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
                                             $('.dimmer')[0].setAttribute('class', 'ui inverted dimmer');
                                         },
-                                        error: function (error) {
+                                        error: function(error) {
                                             $('.modal .header')[0].textContent = error.statusText;
                                             $('.modal .content p')[0].textContent = error.responseText;
                                             $('.modal').modal('setting', 'transition', 'vertical flip').modal('show');
@@ -280,6 +297,7 @@
                             }
                         });
                     }
+
                 </script>
 
                 <% include ../../partials/users/footer.ejs %>

@@ -68,7 +68,13 @@ router.get('/long-term', function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT * FROM `pot` WHERE `match` IS NULL", callback);
+                if(request.isAuthenticated() && request.user.admin) {
+                    connection.query("SELECT * FROM `pot` WHERE `match` IS NULL", callback);
+                } else if(request.isAuthenticated() && !request.user.suspended) {
+                    connection.query("SELECT * FROM `pot` WHERE `match` IS NULL AND `closeTime` >= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30')", callback);
+                } else {
+                    return callback("Unauthenticated/Unauthorized User.");
+                }
             },
             function(pots) {
                 var callback = arguments[arguments.length-1];
@@ -87,7 +93,14 @@ router.get('/long-term', function (request, response) {
             function(pots, teams, players) {
                 var callback = arguments[arguments.length-1];
                 pots.forEach(pot => {
-                    pot.options = [];
+                    if(request.isAuthenticated() && request.user.admin) {
+                        pot.options = [{
+                            key: "NO RESULT",
+                            value: "NO RESULT"
+                        }];
+                    } else {
+                        pot.options = [];
+                    }
                     if(pot.isTeamLevel) {
                         teams.forEach(team => {
                             pot.options.push({
@@ -149,7 +162,14 @@ router.get('/match/:matchId', function (request, response) {
             function(pots, teams, players) {
                 var callback = arguments[arguments.length-1];
                 pots.forEach(pot => {
-                    pot.options = [];
+                    if(request.isAuthenticated() && request.user.admin) {
+                        pot.options = [{
+                            key: "NO RESULT",
+                            value: "NO RESULT"
+                        }];
+                    } else {
+                        pot.options = [];
+                    }
                     if(pot.isTeamLevel) {
                         pot.options.push({ key: teams.htn, value: teams.htn });
                         pot.options.push({ key: teams.atn, value: teams.atn });
@@ -237,12 +257,12 @@ function _getResult(pots, callback) {
 }
 
 // 7. List of all open pots for a team with total amount on either side
-router.get('/open/teams', util.checkAdmin, function(request, response) {
+router.get('/stats/open/teams', util.checkActiveUser, function(request, response) {
     try {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT p.`id` AS `pot`, m.`id` AS `match`, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30') AND p.`closeTime` >= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30')", callback);
+                connection.query("SELECT p.`id` AS `pot`, m.`id` AS `match`, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1", callback);
             },
             function(pots) {
                 var callback = arguments[arguments.length-1];
@@ -250,9 +270,104 @@ router.get('/open/teams', util.checkAdmin, function(request, response) {
             },
             function(inPots, result) {
                 var callback = arguments[arguments.length-1];
-                result.teams = {};
-                connection.query("SELECT b.`pot` AS `pot`, b.`betTeam` AS team, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + inPots.join(",") + ") GROUP BY b.`betTeam` ORDER BY b.`pot`", function(error, betGroups) {
+                connection.query("SELECT b.`pot` AS `pot`, b.`betTeam` AS team, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + inPots.join(",") + ") AND b.`winner` IS NULL GROUP BY b.`pot`, b.`betTeam` ORDER BY b.`pot`", function(error, betGroups) {
                     if(error) return callback(error);
+                    else return callback(null, result, betGroups);
+                });
+            },
+            function(result, betGroups) {
+                var callback = arguments[arguments.length-1];
+                var output = {};
+                betGroups.forEach(betGroup => {
+                    output[betGroup.pot] = result[betGroup.pot];
+                    if(output[betGroup.pot].gcd === undefined) output[betGroup.pot].gcd = [];
+                    output[betGroup.pot].teams = typeof output[betGroup.pot].teams !== 'undefined' ? output[betGroup.pot].teams : {};
+                    output[betGroup.pot].teams[betGroup.team] = betGroup.amount;
+                    output[betGroup.pot].gcd.push(betGroup.amount);
+                });
+                
+                for(var pot in output) {
+                    var gcd = util.gcdArray(output[pot].gcd);
+                    for(var team in output[pot].teams) {
+                        output[pot].teams[team] = output[pot].teams[team]/gcd;
+                    }
+                }
+                callback(null, output);
+            }
+        ], connection, function(error, pots) {
+            if(error) return response.status(500).send("Unable to fetch pots.");
+            return response.status(200).send(JSON.stringify(pots));
+        });
+    } catch(exception) {
+        console.log("Error occurred while fetching open pots for teams: " + exception);
+        console.log("Error Stack Trace: " + exception.stack);
+        return response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
+    }
+});
+
+// 8. List of all open pots for players with total amount on all players
+router.get('/stats/open/players', util.checkActiveUser, function(request, response) {
+    try {
+        var connection = mysql.getConnection();
+        mysql.transaction([
+            function(callback) {
+                connection.query("SELECT p.`id` AS `pot`, m.`id` AS match, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1", callback);
+            },
+            function(pots) {
+                var callback = arguments[arguments.length-1];
+                return _getResult(pots, callback);
+            },
+            function(inPots, result) {
+                var callback = arguments[arguments.length-1];
+                connection.query("SELECT b.`pot` AS `pot`, b.`betOn` AS player, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + inPots.join(",") + ") AND b.`winner` IS NULL GROUP BY b.`pot`, b.`betOn` ORDER BY b.`pot`", function(error, betGroups) {
+                    if(error) return callback(error);
+                    else return callback(null, result, betGroups);
+                });
+            },
+            function(result, betGroups) {
+                var callback = arguments[arguments.length-1];
+                var output = {};
+                betGroups.forEach(betGroup => {
+                    output[betGroup.pot] = result[betGroup.pot];
+                    if(output[betGroup.pot].gcd === undefined) output[betGroup.pot].gcd = [];
+                    output[betGroup.pot].players = typeof output[betGroup.pot].players !== 'undefined' ? output[betGroup.pot].players : {};
+                    output[betGroup.pot].players[betGroup.player] = betGroup.amount;
+                    output[betGroup.pot].gcd.push(betGroup.amount);
+                });
+                for(var pot in output) {
+                    var gcd = util.gcdArray(output[pot].gcd);
+                    for(var player in output[pot].players) {
+                        output[pot].players[player] = output[pot].players[player]/gcd;
+                    }
+                }
+                callback(null, output);
+            }
+        ], connection, function(error, pots) {
+            if(error) return response.status(500).send("Unable to fetch pots.");
+            return response.status(200).send(JSON.stringify(pots));
+        });
+    } catch(exception) {
+        console.log("Error occurred while fetching open pots for player: " + exception);
+        console.log("Error Stack Trace: " + exception.stack);
+        return response.status(500).send("Unknown Error Occurred. Contact Technical Administrator.");
+    }
+});
+
+// 7. List of all open pots for a team with total amount on either side
+router.get('/open/teams', util.checkAdmin, function(request, response) {
+    try {
+        var connection = mysql.getConnection();
+        mysql.transaction([
+            function(callback) {
+                connection.query("SELECT p.`id` AS `pot`, m.`id` AS `match`, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1", callback);
+            },
+            function(pots) {
+                var callback = arguments[arguments.length-1];
+                return _getResult(pots, callback);
+            },
+            function(inPots, result) {
+                var callback = arguments[arguments.length-1];
+                connection.query("SELECT b.`pot` AS `pot`, b.`betTeam` AS team, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + inPots.join(",") + ") AND b.`winner` IS NULL GROUP BY b.`pot`, b.`betTeam` ORDER BY b.`pot`", function(error, betGroups) {                    if(error) return callback(error);
                     else return callback(null, result, betGroups);
                 });
             },
@@ -284,7 +399,7 @@ router.get('/open/players', util.checkAdmin, function(request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT p.`id` AS `pot`, m.`id` AS match, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1 AND p.`openTime` <= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30') AND p.`closeTime` >= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30')", callback);
+                connection.query("SELECT p.`id` AS `pot`, m.`id` AS match, p.`displayName` AS potName, t1.`name` AS home, t1.`id` AS homeShort, t2.`name` AS away, t2.`id` AS awayShort, p.`closeTime` AS closeTime FROM `pot` p, `match` m, `team` t1, `team` t2 WHERE p.`match` = m.`id` AND m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND p.`isTeamLevel` = 1", callback);
             },
             function(pots) {
                 var callback = arguments[arguments.length-1];
@@ -292,19 +407,20 @@ router.get('/open/players', util.checkAdmin, function(request, response) {
             },
             function(inPots, result) {
                 var callback = arguments[arguments.length-1];
-                result.players = {};
-                connection.query("SELECT b.`pot` AS `pot`, b.`betOn` AS player, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + pots.join(",") + ") GROUP BY b.`betOn` ORDER BY b.`pot`", function(error, betGroups) {
+                connection.query("SELECT b.`pot` AS `pot`, b.`betOn` AS player, SUM(b.`betAmount`) AS amount FROM `bet` b WHERE b.`pot` IN (" + inPots.join(",") + ") AND b.`winner` IS NULL GROUP BY b.`pot`, b.`betOn` ORDER BY b.`pot`", function(error, betGroups) {
                     if(error) return callback(error);
                     else return callback(null, result, betGroups);
                 });
             },
             function(result, betGroups) {
                 var callback = arguments[arguments.length-1];
-                betsGroup.forEach(betGroup => {
-                    var potResult = finalResult[betGroup.pot].players;
-                    potResult[betGroup.player] = betGroup.amount;
+                var output = {};
+                betGroups.forEach(betGroup => {
+                    output[betGroup.pot] = result[betGroup.pot];
+                    output[betGroup.pot].players = typeof output[betGroup.pot].players !== 'undefined' ? output[betGroup.pot].players : {};
+                    output[betGroup.pot].players[betGroup.player] = betGroup.amount;
                 });
-                callback(null, result);
+                callback(null, output);
             }
         ], connection, function(error, pots) {
             if(error) return response.status(500).send("Unable to fetch pots.");
@@ -371,7 +487,7 @@ router.post('/add/short-term', util.checkAdmin, function (request, response) {
             function() {
                 // Update Multipliers of all users' bets
                 var callback = arguments[arguments.length-1];
-                connection.query("UPDATE `bet` b INNER JOIN `pot` p ON b.`pot` = p.`id` INNER JOIN `match` m ON p.`match` = m.`id` SET b.`multiplier` = CASE b.`betOn` WHEN m.`homeTeam` THEN p.`multiplierHome` ELSE p.`multiplierAway` END WHERE p.`match` = ? AND p.`isTeamLevel` = 1", data.match, callback);
+                connection.query("UPDATE `bet` b INNER JOIN `pot` p ON b.`pot` = p.`id` INNER JOIN `match` m ON p.`match` = m.`id` SET b.`multiplier` = CASE WHEN b.`betTeam` = m.`homeTeam` THEN p.`multiplierHome` ELSE p.`multiplierAway` END WHERE p.`match` = ? AND p.`isTeamLevel` = 1", data.match, callback);
             },
             function(matches) {
                 // Insert Static Pots
@@ -423,7 +539,17 @@ router.post('/update-winner', util.checkAdmin, function(request, response) {
             tasks.push(
                 function() {
                     var callback = arguments[arguments.length-1];
-                    connection.query("CALL UpdatePotResult(?, ?)", [ potId, "'" + data[potId].join("','") + "'" ], callback);
+                    if(data[potId] && data[potId].length > 0) {
+                        var res;
+                        if(data[potId][0] === "NO RESULT") {
+                            res = data[potId][0];
+                        } else {
+                            res = "'" + data[potId].join("','") + "'";
+                        }
+                        connection.query("CALL UpdatePotResult(?, ?)", [ potId, res ], callback);
+                    } else {
+                        callback(null);
+                    }
                 }
             );
             data[potId].forEach(result => {

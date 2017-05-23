@@ -29,7 +29,7 @@
         }
 
         function normalizeTime(date) {
-            return date.getHours() + ":" + (date.getMinutes() > 9 ? date.getMinutes() : ("0" + date.getMinutes())) + ":" + (date.getSeconds() > 9 ? date.getSeconds() : ("0" + date.getSeconds()));
+            return (date.getHours() > 9 ? date.getHours() : ("0"+ date.getHours())) + ":" + (date.getMinutes() > 9 ? date.getMinutes() : ("0" + date.getMinutes())) + ":" + (date.getSeconds() > 9 ? date.getSeconds() : ("0" + date.getSeconds()));
         }
 
         function staticEntry(name, active) {
@@ -267,6 +267,8 @@
                     });
                     $.ajax('/apis/pot/static/' + matchID, {
                         success: function(data) {
+                            var d2 = JSON.parse(data);
+
                             data = JSON.parse(data);
                             data.active.map(function(item, index) {
                                 data.active[index] = {
@@ -317,7 +319,7 @@
                                 };
                                 var static = [];
                                 $('input[type=checkbox]').each(function(index, item) {
-                                    if (item.checked) {
+                                    if (item.checked && d2.active.indexOf(item.id) === -1) {
                                         static.push(item.id);
                                     }
                                 });

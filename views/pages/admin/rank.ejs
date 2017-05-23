@@ -26,9 +26,7 @@
         $.ajax('/apis/user/activeadm', {
             success: function (data) {
                 data = JSON.parse(data);
-                data.sort((userA, userB) => {
-                    return userA.balance > userB.balance ? 0 : 1;
-                });
+
                 var table = $('table')[0];
                 data.forEach((user, index) => {
                     var tr = document.createElement('tr');

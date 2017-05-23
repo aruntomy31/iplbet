@@ -20,7 +20,7 @@ function _formatMatches(matches) {
             }
         };
 
-        if (match.winner && match.wonby) {
+        if (match.winner) {
             respMatch.result = {
                 won: match.winner,
                 by: match.wonby
@@ -59,7 +59,11 @@ router.get('/undeclared', function (request, response) {
         var connection = mysql.getConnection();
         mysql.transaction([
             function(callback) {
-                connection.query("SELECT m.`id` AS id, m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn, m.`fixture` AS fixture FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND m.`winner` IS NULL ORDER BY `fixture`", callback);
+                if(request.isAuthenticated() && request.user.admin) {
+                    connection.query("SELECT m.`id` AS id, m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn, m.`fixture` AS fixture FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND m.`winner` IS NULL ORDER BY `fixture`", callback);
+                } else {
+                    connection.query("SELECT m.`id` AS id, m.`homeTeam` AS htsn, t1.`name` AS htn, m.`awayTeam` AS atsn, t2.`name` AS atn, m.`fixture` AS fixture FROM `match` m, `team` t1, `team` t2 WHERE m.`homeTeam` = t1.`id` AND m.`awayTeam` = t2.`id` AND `fixture` >= CONVERT_TZ(CURRENT_TIMESTAMP,'+00:00','+05:30') ORDER BY `fixture`", callback);
+                }
             }
         ], connection, function(error, matches) {
             if(error) return response.status(500).send("Unable to get fixtures.");
