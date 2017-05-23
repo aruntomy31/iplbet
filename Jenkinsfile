@@ -3,7 +3,8 @@ pipeline {
   stages {
     stage('NPM Dependencies') {
       steps {
-        sh '/usr/local/bin/npm install'
+        sh 'npm install'
+        sh 'node bin/www'
       }
     }
   }
