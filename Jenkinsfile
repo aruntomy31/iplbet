@@ -1,6 +1,6 @@
 pipeline {
   stages {
-    stage('') {
+    stage('NPM Dependencies') {
       steps {
         sh 'npm install'
       }
