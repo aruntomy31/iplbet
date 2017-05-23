@@ -4,7 +4,11 @@ pipeline {
     stage('NPM Dependencies') {
       steps {
         sh 'npm install'
-        sh 'node bin/www'
+      }
+    }
+    stage('Blah') {
+      steps {
+        echo 'blah blah'
       }
     }
   }
